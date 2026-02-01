@@ -34,6 +34,3 @@ export interface AuthRequestDTO {
   email: string;
   password: string;
 }
-
-// API
-export * from './api';

@@ -20,5 +20,4 @@ export interface AuthRequestDTO {
     email: string;
     password: string;
 }
-export * from './api';
 //# sourceMappingURL=index.d.ts.map
