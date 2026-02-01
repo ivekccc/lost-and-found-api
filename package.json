@@ -1,0 +1,25 @@
+{
+  "name": "@lost-and-found/api",
+  "version": "1.0.0",
+  "description": "Shared TypeScript types and API for Lost and Found platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "peerDependencies": {
+    "axios": "^1.0.0"
+  },
+  "devDependencies": {
+    "axios": "^1.7.0",
+    "rimraf": "^6.1.2",
+    "typescript": "^5.9.3"
+  }
+}
