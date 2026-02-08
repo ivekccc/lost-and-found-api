@@ -8,16 +8,20 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-export interface RegisterRequestDTO {
-  email: string;
-  username: string;
-  password: string;
+export interface VerifyRequestDTO {
+  code: string;
 }
 
 export interface AuthResponseDTO {
   token?: string;
   refreshToken?: string;
   message?: string;
+}
+
+export interface RegisterRequestDTO {
+  email: string;
+  username: string;
+  password: string;
 }
 
 export interface RefreshTokenRequestDTO {
@@ -33,4 +37,43 @@ export interface RefreshTokenResponseDTO {
 export interface AuthRequestDTO {
   email: string;
   password: string;
+}
+
+export interface ReportListDTO {
+  id?: number;
+  title?: string;
+  type?: ReportType;
+  categoryName?: string;
+  status?: ReportStatus;
+  location?: string;
+  createdAt?: Date;
+}
+
+export enum ReportStatus {
+  ACTIVE = "ACTIVE",
+  RESOLVED = "RESOLVED",
+  EXPIRED = "EXPIRED",
+  FLAGGED = "FLAGGED",
+  DELETED = "DELETED",
+}
+
+export enum ReportType {
+  LOST = "LOST",
+  FOUND = "FOUND",
+}
+
+export interface ReportDetailsDTO {
+  id?: number;
+  title?: string;
+  description?: string;
+  type?: ReportType;
+  categoryId?: number;
+  categoryName?: string;
+  status?: ReportStatus;
+  location?: string;
+  createdAt?: Date;
+  expiresAt?: Date;
+  userId?: number;
+  contactEmail?: string;
+  contactPhone?: string;
 }

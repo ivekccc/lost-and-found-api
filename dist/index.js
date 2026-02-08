@@ -5,4 +5,18 @@
 // </auto-generated>
 //----------------------
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ReportType = exports.ReportStatus = void 0;
+var ReportStatus;
+(function (ReportStatus) {
+    ReportStatus["ACTIVE"] = "ACTIVE";
+    ReportStatus["RESOLVED"] = "RESOLVED";
+    ReportStatus["EXPIRED"] = "EXPIRED";
+    ReportStatus["FLAGGED"] = "FLAGGED";
+    ReportStatus["DELETED"] = "DELETED";
+})(ReportStatus || (exports.ReportStatus = ReportStatus = {}));
+var ReportType;
+(function (ReportType) {
+    ReportType["LOST"] = "LOST";
+    ReportType["FOUND"] = "FOUND";
+})(ReportType || (exports.ReportType = ReportType = {}));
 //# sourceMappingURL=index.js.map
