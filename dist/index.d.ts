@@ -1,3 +1,39 @@
+/** Request body for creating a new report */
+export interface CreateReportRequest {
+    title: string;
+    description?: string;
+    type: ReportType;
+    categoryId: number;
+    location?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+}
+export declare enum ReportType {
+    LOST = "LOST",
+    FOUND = "FOUND"
+}
+export interface ReportDetailsDTO {
+    id?: number;
+    title?: string;
+    description?: string;
+    type?: ReportType;
+    categoryId?: number;
+    categoryName?: string;
+    status?: ReportStatus;
+    location?: string;
+    createdAt?: Date;
+    expiresAt?: Date;
+    userId?: number;
+    contactEmail?: string;
+    contactPhone?: string;
+}
+export declare enum ReportStatus {
+    ACTIVE = "ACTIVE",
+    RESOLVED = "RESOLVED",
+    EXPIRED = "EXPIRED",
+    FLAGGED = "FLAGGED",
+    DELETED = "DELETED"
+}
 export interface VerifyRequestDTO {
     code: string;
 }
@@ -32,30 +68,9 @@ export interface ReportListDTO {
     location?: string;
     createdAt?: Date;
 }
-export declare enum ReportStatus {
-    ACTIVE = "ACTIVE",
-    RESOLVED = "RESOLVED",
-    EXPIRED = "EXPIRED",
-    FLAGGED = "FLAGGED",
-    DELETED = "DELETED"
-}
-export declare enum ReportType {
-    LOST = "LOST",
-    FOUND = "FOUND"
-}
-export interface ReportDetailsDTO {
+/** Report category information */
+export interface ReportCategoryDto {
     id?: number;
-    title?: string;
-    description?: string;
-    type?: ReportType;
-    categoryId?: number;
-    categoryName?: string;
-    status?: ReportStatus;
-    location?: string;
-    createdAt?: Date;
-    expiresAt?: Date;
-    userId?: number;
-    contactEmail?: string;
-    contactPhone?: string;
+    name?: string;
 }
 //# sourceMappingURL=index.d.ts.map

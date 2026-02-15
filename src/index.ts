@@ -8,6 +8,46 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
+/** Request body for creating a new report */
+export interface CreateReportRequest {
+  title: string;
+  description?: string;
+  type: ReportType;
+  categoryId: number;
+  location?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+}
+
+export enum ReportType {
+  LOST = "LOST",
+  FOUND = "FOUND",
+}
+
+export interface ReportDetailsDTO {
+  id?: number;
+  title?: string;
+  description?: string;
+  type?: ReportType;
+  categoryId?: number;
+  categoryName?: string;
+  status?: ReportStatus;
+  location?: string;
+  createdAt?: Date;
+  expiresAt?: Date;
+  userId?: number;
+  contactEmail?: string;
+  contactPhone?: string;
+}
+
+export enum ReportStatus {
+  ACTIVE = "ACTIVE",
+  RESOLVED = "RESOLVED",
+  EXPIRED = "EXPIRED",
+  FLAGGED = "FLAGGED",
+  DELETED = "DELETED",
+}
+
 export interface VerifyRequestDTO {
   code: string;
 }
@@ -49,31 +89,8 @@ export interface ReportListDTO {
   createdAt?: Date;
 }
 
-export enum ReportStatus {
-  ACTIVE = "ACTIVE",
-  RESOLVED = "RESOLVED",
-  EXPIRED = "EXPIRED",
-  FLAGGED = "FLAGGED",
-  DELETED = "DELETED",
-}
-
-export enum ReportType {
-  LOST = "LOST",
-  FOUND = "FOUND",
-}
-
-export interface ReportDetailsDTO {
+/** Report category information */
+export interface ReportCategoryDto {
   id?: number;
-  title?: string;
-  description?: string;
-  type?: ReportType;
-  categoryId?: number;
-  categoryName?: string;
-  status?: ReportStatus;
-  location?: string;
-  createdAt?: Date;
-  expiresAt?: Date;
-  userId?: number;
-  contactEmail?: string;
-  contactPhone?: string;
+  name?: string;
 }
