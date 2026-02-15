@@ -25,17 +25,17 @@ export enum ReportType {
 }
 
 export interface ReportDetailsDTO {
-  id?: number;
-  title?: string;
+  id: number;
+  title: string;
   description?: string;
-  type?: ReportType;
-  categoryId?: number;
-  categoryName?: string;
-  status?: ReportStatus;
+  type: ReportType;
+  categoryId: number;
+  categoryName: string;
+  status: ReportStatus;
   location?: string;
-  createdAt?: Date;
+  createdAt: Date;
   expiresAt?: Date;
-  userId?: number;
+  userId: number;
   contactEmail?: string;
   contactPhone?: string;
 }
@@ -53,8 +53,8 @@ export interface VerifyRequestDTO {
 }
 
 export interface AuthResponseDTO {
-  token?: string;
-  refreshToken?: string;
+  token: string;
+  refreshToken: string;
   message?: string;
 }
 
@@ -65,12 +65,12 @@ export interface RegisterRequestDTO {
 }
 
 export interface RefreshTokenRequestDTO {
-  refreshToken?: string;
+  refreshToken: string;
 }
 
 export interface RefreshTokenResponseDTO {
-  accessToken?: string;
-  refreshToken?: string;
+  accessToken: string;
+  refreshToken: string;
   message?: string;
 }
 
@@ -80,17 +80,16 @@ export interface AuthRequestDTO {
 }
 
 export interface ReportListDTO {
-  id?: number;
-  title?: string;
-  type?: ReportType;
-  categoryName?: string;
-  status?: ReportStatus;
+  id: number;
+  title: string;
+  type: ReportType;
+  categoryName: string;
+  status: ReportStatus;
   location?: string;
-  createdAt?: Date;
+  createdAt: Date;
 }
 
-/** Report category information */
 export interface ReportCategoryDto {
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
 }
