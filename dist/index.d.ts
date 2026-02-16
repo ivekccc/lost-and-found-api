@@ -20,7 +20,6 @@ export interface ReportDetailsDTO {
     categoryId: number;
     categoryName: string;
     status: ReportStatus;
-    location?: string;
     createdAt: Date;
     expiresAt?: Date;
     userId: number;
@@ -65,11 +64,18 @@ export interface ReportListDTO {
     type: ReportType;
     categoryName: string;
     status: ReportStatus;
-    location?: string;
     createdAt: Date;
 }
 export interface ReportCategoryDto {
     id: number;
     name: string;
+}
+export interface AutoCompleteSuggestionDTO {
+    placeId?: string;
+    displayName?: string;
+    displayPlace?: string;
+    displayAddress?: string;
+    latitude?: number;
+    longitude?: number;
 }
 //# sourceMappingURL=index.d.ts.map
