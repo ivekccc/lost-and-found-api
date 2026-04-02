@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "generate": "npx openapi-typescript http://localhost:8082/v3/api-docs -o ./src/index.ts --root-types --root-types-no-schema-prefix --enum",
+    "generate": "npx @hey-api/openapi-ts",
     "build": "tsc",
     "clean": "rimraf dist"
   },
@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@hey-api/openapi-ts": "^0.95.0",
     "openapi-typescript": "^7.13.0",
     "rimraf": "^6.1.2",
     "typescript": "^5.9.3"
