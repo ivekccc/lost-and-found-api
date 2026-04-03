@@ -21,12 +21,8 @@ export type CreateReportRequest = {
  * Request body for location data
  */
 export type LocationRequest = {
-    latitude: number;
-    longitude: number;
-    displayName: string;
-    placeId?: string;
-    displayPlace?: string;
-    displayAddress?: string;
+    osmId: string;
+    osmType: string;
 };
 
 export enum ReportType {
@@ -107,12 +103,11 @@ export type ReportCategoryDto = {
 };
 
 export type AutoCompleteSuggestionDto = {
-    placeId?: string;
+    osmId?: string;
+    osmType?: string;
     displayName?: string;
     displayPlace?: string;
     displayAddress?: string;
-    latitude?: number;
-    longitude?: number;
 };
 
 export type GetReportsData = {
