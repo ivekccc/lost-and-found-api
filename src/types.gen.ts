@@ -12,9 +12,21 @@ export type CreateReportRequest = {
     description?: string;
     type: ReportType;
     categoryId: number;
-    location?: string;
+    location?: LocationRequest;
     contactEmail?: string;
     contactPhone?: string;
+};
+
+/**
+ * Request body for location data
+ */
+export type LocationRequest = {
+    latitude: number;
+    longitude: number;
+    displayName: string;
+    placeId?: string;
+    displayPlace?: string;
+    displayAddress?: string;
 };
 
 export enum ReportType {
