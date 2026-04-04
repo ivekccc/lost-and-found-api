@@ -30,6 +30,15 @@ export enum ReportType {
     FOUND = 'FOUND'
 }
 
+/**
+ * Location data
+ */
+export type LocationDto = {
+    latitude?: number;
+    longitude?: number;
+    formattedAddress?: string;
+};
+
 export type ReportDetailsDto = {
     id: number;
     title: string;
@@ -38,6 +47,7 @@ export type ReportDetailsDto = {
     categoryId: number;
     categoryName: string;
     status: ReportStatus;
+    location: LocationDto;
     createdAt: string;
     expiresAt?: string;
     userId: number;
@@ -94,6 +104,7 @@ export type ReportListDto = {
     type: ReportType;
     categoryName: string;
     status: ReportStatus;
+    location: LocationDto;
     createdAt: string;
 };
 
