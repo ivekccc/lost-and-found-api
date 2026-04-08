@@ -4,6 +4,22 @@ export type ClientOptions = {
     baseUrl: 'http://localhost:8082' | (string & {});
 };
 
+export type UpdateUserProfileDto = {
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+};
+
+export type UserProfileDto = {
+    id: number;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+    createdAt: string;
+};
+
 /**
  * Request body for creating a new report
  */
@@ -101,16 +117,6 @@ export type AuthRequestDto = {
     password: string;
 };
 
-export type UserProfileDto = {
-    id: number;
-    email: string;
-    username: string;
-    firstName: string;
-    lastName: string;
-    phoneNumber?: string;
-    createdAt: string;
-};
-
 export type ReportListDto = {
     id: number;
     title: string;
@@ -133,6 +139,38 @@ export type AutoCompleteSuggestionDto = {
     displayPlace?: string;
     displayAddress?: string;
 };
+
+export type GetProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type GetProfileResponses = {
+    /**
+     * User profile retrieved successfully
+     */
+    200: UserProfileDto;
+};
+
+export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
+
+export type UpdateProfileData = {
+    body: UpdateUserProfileDto;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type UpdateProfileResponses = {
+    /**
+     * User profile updated successfully
+     */
+    200: UserProfileDto;
+};
+
+export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
 
 export type GetReportsData = {
     body?: never;
@@ -259,22 +297,6 @@ export type LoginResponses = {
 };
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
-
-export type GetProfileData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/users/me';
-};
-
-export type GetProfileResponses = {
-    /**
-     * User profile retrieved successfully
-     */
-    200: UserProfileDto;
-};
-
-export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
 
 export type SecretData = {
     body?: never;
