@@ -81,6 +81,9 @@ export type RegisterRequestDto = {
     email: string;
     username: string;
     password: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
 };
 
 export type RefreshTokenRequestDto = {
@@ -96,6 +99,16 @@ export type RefreshTokenResponseDto = {
 export type AuthRequestDto = {
     email: string;
     password: string;
+};
+
+export type UserProfileDto = {
+    id: number;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+    createdAt: string;
 };
 
 export type ReportListDto = {
@@ -246,6 +259,22 @@ export type LoginResponses = {
 };
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type GetProfileData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type GetProfileResponses = {
+    /**
+     * User profile retrieved successfully
+     */
+    200: UserProfileDto;
+};
+
+export type GetProfileResponse = GetProfileResponses[keyof GetProfileResponses];
 
 export type SecretData = {
     body?: never;
