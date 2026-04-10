@@ -31,6 +31,7 @@ export type CreateReportRequest = {
     location?: LocationRequest;
     contactEmail?: string;
     contactPhone?: string;
+    images?: Array<ReportImageRequestDto>;
 };
 
 /**
@@ -39,6 +40,11 @@ export type CreateReportRequest = {
 export type LocationRequest = {
     osmId: string;
     osmType: string;
+};
+
+export type ReportImageRequestDto = {
+    imageUrl: string;
+    publicId: string;
 };
 
 export enum ReportType {
@@ -69,6 +75,13 @@ export type ReportDetailsDto = {
     userId: number;
     contactEmail?: string;
     contactPhone?: string;
+    images?: Array<ReportImageDto>;
+};
+
+export type ReportImageDto = {
+    id: number;
+    imageUrl: string;
+    displayOrder: number;
 };
 
 export enum ReportStatus {
@@ -125,6 +138,7 @@ export type ReportListDto = {
     status: ReportStatus;
     location: LocationDto;
     createdAt: string;
+    thumbnailUrl?: string;
 };
 
 export type ReportCategoryDto = {
@@ -138,6 +152,14 @@ export type AutoCompleteSuggestionDto = {
     displayName?: string;
     displayPlace?: string;
     displayAddress?: string;
+};
+
+export type CloudinarySignatureDto = {
+    signature: string;
+    timestamp: number;
+    cloudName: string;
+    apiKey: string;
+    folder: string;
 };
 
 export type GetProfileData = {
@@ -365,3 +387,19 @@ export type AutocompleteResponses = {
 };
 
 export type AutocompleteResponse = AutocompleteResponses[keyof AutocompleteResponses];
+
+export type GetSignatureData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/cloudinary/signature';
+};
+
+export type GetSignatureResponses = {
+    /**
+     * Signature generated successfully
+     */
+    200: CloudinarySignatureDto;
+};
+
+export type GetSignatureResponse = GetSignatureResponses[keyof GetSignatureResponses];
