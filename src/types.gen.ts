@@ -18,6 +18,7 @@ export type UserProfileDto = {
     lastName: string;
     phoneNumber?: string;
     createdAt: string;
+    role: string;
 };
 
 /**
@@ -104,6 +105,7 @@ export type AuthResponseDto = {
     token: string;
     refreshToken: string;
     message?: string;
+    role: string;
 };
 
 export type RegisterRequestDto = {
@@ -144,6 +146,56 @@ export type ReportListDto = {
 export type ReportCategoryDto = {
     id: number;
     name: string;
+};
+
+export type NotificationDto = {
+    id: number;
+    type: NotificationType;
+    title: string;
+    body: string;
+    dataJson?: string;
+    isRead: boolean;
+    createdAt: string;
+};
+
+export enum NotificationType {
+    REPORT_CREATED = 'REPORT_CREATED',
+    MATCH_FOUND = 'MATCH_FOUND',
+    REPORT_EXPIRED = 'REPORT_EXPIRED',
+    REPORT_RESOLVED = 'REPORT_RESOLVED'
+}
+
+export type PageNotificationDto = {
+    totalPages?: number;
+    totalElements?: number;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
+    pageable?: PageableObject;
+    size?: number;
+    content?: Array<NotificationDto>;
+    number?: number;
+    sort?: SortObject;
+    empty?: boolean;
+};
+
+export type PageableObject = {
+    paged?: boolean;
+    pageNumber?: number;
+    pageSize?: number;
+    unpaged?: boolean;
+    offset?: number;
+    sort?: SortObject;
+};
+
+export type SortObject = {
+    sorted?: boolean;
+    unsorted?: boolean;
+    empty?: boolean;
+};
+
+export type UnreadCountDto = {
+    count: number;
 };
 
 export type AutoCompleteSuggestionDto = {
@@ -242,20 +294,6 @@ export type RegisterTokenResponses = {
     200: unknown;
 };
 
-export type BroadcastData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/notifications/broadcast';
-};
-
-export type BroadcastResponses = {
-    /**
-     * OK
-     */
-    200: unknown;
-};
-
 export type VerifyData = {
     body: VerifyRequestDto;
     path?: never;
@@ -320,6 +358,36 @@ export type LoginResponses = {
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
 
+export type MarkAsReadData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/notifications/{id}/read';
+};
+
+export type MarkAsReadResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type MarkAllAsReadData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/notifications/read-all';
+};
+
+export type MarkAllAsReadResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type SecretData = {
     body?: never;
     path?: never;
@@ -369,6 +437,41 @@ export type GetAllCategoriesResponses = {
 };
 
 export type GetAllCategoriesResponse = GetAllCategoriesResponses[keyof GetAllCategoriesResponses];
+
+export type GetNotificationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        size?: number;
+    };
+    url: '/notifications';
+};
+
+export type GetNotificationsResponses = {
+    /**
+     * OK
+     */
+    200: PageNotificationDto;
+};
+
+export type GetNotificationsResponse = GetNotificationsResponses[keyof GetNotificationsResponses];
+
+export type GetUnreadCountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/notifications/unread-count';
+};
+
+export type GetUnreadCountResponses = {
+    /**
+     * OK
+     */
+    200: UnreadCountDto;
+};
+
+export type GetUnreadCountResponse = GetUnreadCountResponses[keyof GetUnreadCountResponses];
 
 export type AutocompleteData = {
     body?: never;
