@@ -166,12 +166,12 @@ export enum NotificationType {
 }
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
-    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -212,6 +212,24 @@ export type CloudinarySignatureDto = {
     cloudName: string;
     apiKey: string;
     folder: string;
+};
+
+export enum UserRole {
+    USER = 'USER',
+    ADMIN = 'ADMIN',
+    COORDINATOR = 'COORDINATOR'
+}
+
+export type UserListDto = {
+    id: number;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED';
+    role: UserRole;
+    createdAt: string;
 };
 
 export type GetProfileData = {
@@ -506,3 +524,21 @@ export type GetSignatureResponses = {
 };
 
 export type GetSignatureResponse = GetSignatureResponses[keyof GetSignatureResponses];
+
+export type GetAllUsersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        role?: UserRole;
+    };
+    url: '/admin/users';
+};
+
+export type GetAllUsersResponses = {
+    /**
+     * OK
+     */
+    200: Array<UserListDto>;
+};
+
+export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];
