@@ -74,6 +74,7 @@ export type ReportDetailsDto = {
     createdAt: string;
     expiresAt?: string;
     userId: number;
+    userFullName?: string;
     contactEmail?: string;
     contactPhone?: string;
     images?: Array<ReportImageDto>;
@@ -166,8 +167,8 @@ export enum NotificationType {
 }
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     numberOfElements?: number;
     first?: boolean;
@@ -221,6 +222,18 @@ export enum UserRole {
 }
 
 export type UserListDto = {
+    id: number;
+    email: string;
+    username: string;
+    firstName: string;
+    lastName: string;
+    phoneNumber?: string;
+    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED';
+    role: UserRole;
+    createdAt: string;
+};
+
+export type UserDetailsDto = {
     id: number;
     email: string;
     username: string;
@@ -542,3 +555,21 @@ export type GetAllUsersResponses = {
 };
 
 export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];
+
+export type GetUserByIdData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/users/{id}';
+};
+
+export type GetUserByIdResponses = {
+    /**
+     * OK
+     */
+    200: UserDetailsDto;
+};
+
+export type GetUserByIdResponse = GetUserByIdResponses[keyof GetUserByIdResponses];
