@@ -174,10 +174,10 @@ export enum NotificationType {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -186,10 +186,10 @@ export type PageNotificationDto = {
 };
 
 export type PageableObject = {
+    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
-    unpaged?: boolean;
     offset?: number;
     sort?: SortObject;
 };
@@ -248,6 +248,24 @@ export type UserDetailsDto = {
     status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED';
     role: UserRole;
     createdAt: string;
+};
+
+export type AdminReportDetailsDto = {
+    id: number;
+    title: string;
+    description?: string;
+    type: ReportType;
+    categoryId: number;
+    categoryName: string;
+    status: ReportStatus;
+    location: LocationDto;
+    createdAt: string;
+    expiresAt?: string;
+    userId: number;
+    userFullName?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    images?: Array<ReportImageDto>;
 };
 
 export type GetProfileData = {
@@ -468,22 +486,9 @@ export type RevealContactData = {
     url: '/reports/{id}/contact';
 };
 
-export type RevealContactErrors = {
-    /**
-     * Report not found or has no contact information
-     */
-    404: ReportContactDto;
-    /**
-     * Rate limit exceeded
-     */
-    429: ReportContactDto;
-};
-
-export type RevealContactError = RevealContactErrors[keyof RevealContactErrors];
-
 export type RevealContactResponses = {
     /**
-     * Contact information revealed
+     * OK
      */
     200: ReportContactDto;
 };
@@ -610,3 +615,21 @@ export type GetUserByIdResponses = {
 };
 
 export type GetUserByIdResponse = GetUserByIdResponses[keyof GetUserByIdResponses];
+
+export type GetReportById1Data = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/reports/{id}';
+};
+
+export type GetReportById1Responses = {
+    /**
+     * OK
+     */
+    200: AdminReportDetailsDto;
+};
+
+export type GetReportById1Response = GetReportById1Responses[keyof GetReportById1Responses];
