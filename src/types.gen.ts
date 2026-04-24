@@ -75,8 +75,8 @@ export type ReportDetailsDto = {
     expiresAt?: string;
     userId: number;
     userFullName?: string;
-    contactEmail?: string;
-    contactPhone?: string;
+    hasContactEmail: boolean;
+    hasContactPhone: boolean;
     images?: Array<ReportImageDto>;
 };
 
@@ -144,6 +144,11 @@ export type ReportListDto = {
     thumbnailUrl?: string;
 };
 
+export type ReportContactDto = {
+    contactEmail?: string;
+    contactPhone?: string;
+};
+
 export type ReportCategoryDto = {
     id: number;
     name: string;
@@ -190,8 +195,8 @@ export type PageableObject = {
 };
 
 export type SortObject = {
-    sorted?: boolean;
     unsorted?: boolean;
+    sorted?: boolean;
     empty?: boolean;
 };
 
@@ -282,6 +287,7 @@ export type GetReportsData = {
     path?: never;
     query?: {
         type?: ReportType;
+        search?: string;
     };
     url: '/reports';
 };
@@ -452,6 +458,37 @@ export type GetReportByIdResponses = {
 };
 
 export type GetReportByIdResponse = GetReportByIdResponses[keyof GetReportByIdResponses];
+
+export type RevealContactData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/contact';
+};
+
+export type RevealContactErrors = {
+    /**
+     * Report not found or has no contact information
+     */
+    404: ReportContactDto;
+    /**
+     * Rate limit exceeded
+     */
+    429: ReportContactDto;
+};
+
+export type RevealContactError = RevealContactErrors[keyof RevealContactErrors];
+
+export type RevealContactResponses = {
+    /**
+     * Contact information revealed
+     */
+    200: ReportContactDto;
+};
+
+export type RevealContactResponse = RevealContactResponses[keyof RevealContactResponses];
 
 export type GetAllCategoriesData = {
     body?: never;
