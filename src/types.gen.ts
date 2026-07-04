@@ -21,6 +21,42 @@ export type UserProfileDto = {
     role: string;
 };
 
+export type UpdateMinQuestionsRequestDto = {
+    minQuestions: number;
+};
+
+export enum QuestionKind {
+    TEXT = 'TEXT',
+    CHOICE = 'CHOICE'
+}
+
+export type UpdateQuestionTemplateRequestDto = {
+    prompt: string;
+    kind: QuestionKind;
+    defaultChoices?: Array<string>;
+    isActive: boolean;
+};
+
+export type AdminQuestionTemplateDto = {
+    id: number;
+    categoryId: number;
+    categoryName: string;
+    prompt: string;
+    kind: QuestionKind;
+    defaultChoices?: Array<string>;
+    isActive: boolean;
+    createdAt: string;
+};
+
+export type ChallengeQuestionRequestDto = {
+    prompt: string;
+    kind: QuestionKind;
+    source: QuestionSource;
+    templateId?: number;
+    choices?: Array<string>;
+    correctAnswer?: string;
+};
+
 /**
  * Request body for creating a new report
  */
@@ -33,6 +69,7 @@ export type CreateReportRequest = {
     contactEmail?: string;
     contactPhone?: string;
     images?: Array<ReportImageRequestDto>;
+    questions?: Array<ChallengeQuestionRequestDto>;
 };
 
 /**
@@ -42,6 +79,11 @@ export type LocationRequest = {
     osmId: string;
     osmType: string;
 };
+
+export enum QuestionSource {
+    TEMPLATE = 'TEMPLATE',
+    CUSTOM = 'CUSTOM'
+}
 
 export type ReportImageRequestDto = {
     imageUrl: string;
@@ -88,14 +130,106 @@ export type ReportImageDto = {
 
 export enum ReportStatus {
     ACTIVE = 'ACTIVE',
+    MATCHED = 'MATCHED',
     RESOLVED = 'RESOLVED',
     EXPIRED = 'EXPIRED',
     FLAGGED = 'FLAGGED',
     DELETED = 'DELETED'
 }
 
+export type CreateChallengeRequestDto = {
+    questions: Array<ChallengeQuestionRequestDto>;
+};
+
+export type ChallengeDto = {
+    id: number;
+    reportId: number;
+    authorId: number;
+    createdAt: string;
+    questions: Array<ChallengeQuestionDto>;
+};
+
+export type ChallengeQuestionDto = {
+    id: number;
+    prompt: string;
+    kind: QuestionKind;
+    source: QuestionSource;
+    templateId?: number;
+    choices?: Array<string>;
+    correctAnswer?: string;
+    orderIndex: number;
+};
+
 export type FcmTokenRequestDto = {
     fcmToken: string;
+};
+
+export type ClaimDetailsDto = {
+    id: number;
+    challengeId: number;
+    reportId: number;
+    status: ClaimStatus;
+    claimantId: number;
+    claimantName?: string;
+    message?: string;
+    photoUrl?: string;
+    submittedAt: string;
+    decidedAt?: string;
+    answers: Array<ClaimReviewAnswerDto>;
+    claimantContact?: RevealedContactDto;
+};
+
+export type ClaimReviewAnswerDto = {
+    questionId: number;
+    prompt: string;
+    kind: QuestionKind;
+    answerText: string;
+    isCorrect?: boolean;
+    expectedAnswer?: string;
+};
+
+export enum ClaimStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    DECLINED = 'DECLINED',
+    WITHDRAWN = 'WITHDRAWN'
+}
+
+export type RevealedContactDto = {
+    name?: string;
+    email: string;
+    phone?: string;
+};
+
+export type ClaimAnswerRequestDto = {
+    questionId: number;
+    answerText: string;
+};
+
+export type CreateClaimRequestDto = {
+    message?: string;
+    photoUrl?: string;
+    photoPublicId?: string;
+    answers: Array<ClaimAnswerRequestDto>;
+};
+
+export type ClaimAnswerDto = {
+    questionId: number;
+    prompt: string;
+    answerText: string;
+};
+
+export type ClaimDto = {
+    id: number;
+    challengeId: number;
+    reportId: number;
+    status: ClaimStatus;
+    message?: string;
+    photoUrl?: string;
+    submittedAt: string;
+    decidedAt?: string;
+    answers: Array<ClaimAnswerDto>;
+    holderContact?: RevealedContactDto;
 };
 
 export type VerifyRequestDto = {
@@ -133,6 +267,13 @@ export type AuthRequestDto = {
     password: string;
 };
 
+export type CreateQuestionTemplateRequestDto = {
+    categoryId: number;
+    prompt: string;
+    kind: QuestionKind;
+    defaultChoices?: Array<string>;
+};
+
 export type ReportListDto = {
     id: number;
     title: string;
@@ -154,6 +295,13 @@ export type ReportCategoryDto = {
     name: string;
 };
 
+export type QuestionTemplateDto = {
+    id: number;
+    prompt: string;
+    kind: QuestionKind;
+    defaultChoices?: Array<string>;
+};
+
 export type NotificationDto = {
     id: number;
     type: NotificationType;
@@ -168,16 +316,20 @@ export enum NotificationType {
     REPORT_CREATED = 'REPORT_CREATED',
     MATCH_FOUND = 'MATCH_FOUND',
     REPORT_EXPIRED = 'REPORT_EXPIRED',
-    REPORT_RESOLVED = 'REPORT_RESOLVED'
+    REPORT_RESOLVED = 'REPORT_RESOLVED',
+    CHALLENGE_CREATED = 'CHALLENGE_CREATED',
+    CLAIM_SUBMITTED = 'CLAIM_SUBMITTED',
+    CLAIM_APPROVED = 'CLAIM_APPROVED',
+    CLAIM_DECLINED = 'CLAIM_DECLINED'
 }
 
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -186,17 +338,17 @@ export type PageNotificationDto = {
 };
 
 export type PageableObject = {
-    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    unpaged?: boolean;
     offset?: number;
     sort?: SortObject;
 };
 
 export type SortObject = {
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
     empty?: boolean;
 };
 
@@ -218,6 +370,32 @@ export type CloudinarySignatureDto = {
     cloudName: string;
     apiKey: string;
     folder: string;
+};
+
+export type ClaimantChallengeDto = {
+    id: number;
+    reportId: number;
+    reportTitle: string;
+    createdAt: string;
+    questions: Array<ClaimantChallengeQuestionDto>;
+};
+
+export type ClaimantChallengeQuestionDto = {
+    id: number;
+    prompt: string;
+    kind: QuestionKind;
+    choices?: Array<string>;
+    orderIndex: number;
+};
+
+export type ClaimSummaryDto = {
+    id: number;
+    status: ClaimStatus;
+    claimantName?: string;
+    submittedAt: string;
+    correctChoiceAnswers: number;
+    totalChoiceAnswers: number;
+    hasPhoto: boolean;
 };
 
 export enum UserRole {
@@ -268,6 +446,19 @@ export type AdminReportDetailsDto = {
     images?: Array<ReportImageDto>;
 };
 
+export type AdminClaimListDto = {
+    id: number;
+    reportId: number;
+    reportTitle: string;
+    reportType: ReportType;
+    challengeId: number;
+    challengeAuthorName?: string;
+    claimantName?: string;
+    status: ClaimStatus;
+    submittedAt: string;
+    decidedAt?: string;
+};
+
 export type GetProfileData = {
     body?: never;
     path?: never;
@@ -299,6 +490,56 @@ export type UpdateProfileResponses = {
 };
 
 export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
+
+export type UpdateMinQuestionsData = {
+    body: UpdateMinQuestionsRequestDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/report-categories/{id}/min-questions';
+};
+
+export type UpdateMinQuestionsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type DeactivateTemplateData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/question-templates/{id}';
+};
+
+export type DeactivateTemplateResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type UpdateTemplateData = {
+    body: UpdateQuestionTemplateRequestDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/question-templates/{id}';
+};
+
+export type UpdateTemplateResponses = {
+    /**
+     * OK
+     */
+    200: AdminQuestionTemplateDto;
+};
+
+export type UpdateTemplateResponse = UpdateTemplateResponses[keyof UpdateTemplateResponses];
 
 export type GetReportsData = {
     body?: never;
@@ -335,6 +576,37 @@ export type CreateReportResponses = {
 
 export type CreateReportResponse = CreateReportResponses[keyof CreateReportResponses];
 
+export type CreateChallengeData = {
+    body: CreateChallengeRequestDto;
+    path: {
+        reportId: number;
+    };
+    query?: never;
+    url: '/reports/{reportId}/challenges';
+};
+
+export type CreateChallengeErrors = {
+    /**
+     * Invalid challenge (wrong report type, own report, too few questions, duplicate)
+     */
+    400: ChallengeDto;
+    /**
+     * Report not found
+     */
+    404: ChallengeDto;
+};
+
+export type CreateChallengeError = CreateChallengeErrors[keyof CreateChallengeErrors];
+
+export type CreateChallengeResponses = {
+    /**
+     * Challenge created
+     */
+    201: ChallengeDto;
+};
+
+export type CreateChallengeResponse = CreateChallengeResponses[keyof CreateChallengeResponses];
+
 export type RegisterTokenData = {
     body: FcmTokenRequestDto;
     path?: never;
@@ -348,6 +620,134 @@ export type RegisterTokenResponses = {
      */
     200: unknown;
 };
+
+export type DeclineClaimData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/claims/{id}/decline';
+};
+
+export type DeclineClaimErrors = {
+    /**
+     * Not the challenge author or claim already decided
+     */
+    400: ClaimDetailsDto;
+    /**
+     * Claim not found
+     */
+    404: ClaimDetailsDto;
+};
+
+export type DeclineClaimError = DeclineClaimErrors[keyof DeclineClaimErrors];
+
+export type DeclineClaimResponses = {
+    /**
+     * Claim declined
+     */
+    200: ClaimDetailsDto;
+};
+
+export type DeclineClaimResponse = DeclineClaimResponses[keyof DeclineClaimResponses];
+
+export type ApproveClaimData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/claims/{id}/approve';
+};
+
+export type ApproveClaimErrors = {
+    /**
+     * Not the challenge author or claim already decided
+     */
+    400: ClaimDetailsDto;
+    /**
+     * Claim not found
+     */
+    404: ClaimDetailsDto;
+};
+
+export type ApproveClaimError = ApproveClaimErrors[keyof ApproveClaimErrors];
+
+export type ApproveClaimResponses = {
+    /**
+     * Claim approved
+     */
+    200: ClaimDetailsDto;
+};
+
+export type ApproveClaimResponse = ApproveClaimResponses[keyof ApproveClaimResponses];
+
+export type GetClaimsForChallengeData = {
+    body?: never;
+    path: {
+        challengeId: number;
+    };
+    query?: never;
+    url: '/challenges/{challengeId}/claims';
+};
+
+export type GetClaimsForChallengeErrors = {
+    /**
+     * Not the challenge author
+     */
+    400: Array<ClaimSummaryDto>;
+    /**
+     * Challenge not found
+     */
+    404: Array<ClaimSummaryDto>;
+};
+
+export type GetClaimsForChallengeError = GetClaimsForChallengeErrors[keyof GetClaimsForChallengeErrors];
+
+export type GetClaimsForChallengeResponses = {
+    /**
+     * Successfully retrieved claims
+     */
+    200: Array<ClaimSummaryDto>;
+};
+
+export type GetClaimsForChallengeResponse = GetClaimsForChallengeResponses[keyof GetClaimsForChallengeResponses];
+
+export type SubmitClaimData = {
+    body: CreateClaimRequestDto;
+    path: {
+        challengeId: number;
+    };
+    query?: never;
+    url: '/challenges/{challengeId}/claims';
+};
+
+export type SubmitClaimErrors = {
+    /**
+     * Invalid claim (own challenge, missing answers, attempts used up)
+     */
+    400: ClaimDto;
+    /**
+     * Challenge not found
+     */
+    404: ClaimDto;
+    /**
+     * Daily claim limit reached
+     */
+    429: ClaimDto;
+};
+
+export type SubmitClaimError = SubmitClaimErrors[keyof SubmitClaimErrors];
+
+export type SubmitClaimResponses = {
+    /**
+     * Claim submitted
+     */
+    201: ClaimDto;
+};
+
+export type SubmitClaimResponse = SubmitClaimResponses[keyof SubmitClaimResponses];
 
 export type VerifyData = {
     body: VerifyRequestDto;
@@ -413,6 +813,40 @@ export type LoginResponses = {
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
 
+export type GetTemplatesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        categoryId?: number;
+    };
+    url: '/admin/question-templates';
+};
+
+export type GetTemplatesResponses = {
+    /**
+     * OK
+     */
+    200: Array<AdminQuestionTemplateDto>;
+};
+
+export type GetTemplatesResponse = GetTemplatesResponses[keyof GetTemplatesResponses];
+
+export type CreateTemplateData = {
+    body: CreateQuestionTemplateRequestDto;
+    path?: never;
+    query?: never;
+    url: '/admin/question-templates';
+};
+
+export type CreateTemplateResponses = {
+    /**
+     * OK
+     */
+    200: AdminQuestionTemplateDto;
+};
+
+export type CreateTemplateResponse = CreateTemplateResponses[keyof CreateTemplateResponses];
+
 export type MarkAsReadData = {
     body?: never;
     path: {
@@ -442,6 +876,22 @@ export type MarkAllAsReadResponses = {
      */
     200: unknown;
 };
+
+export type GetMyClaimsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me/claims';
+};
+
+export type GetMyClaimsResponses = {
+    /**
+     * Successfully retrieved claims
+     */
+    200: Array<ClaimDto>;
+};
+
+export type GetMyClaimsResponse = GetMyClaimsResponses[keyof GetMyClaimsResponses];
 
 export type SecretData = {
     body?: never;
@@ -510,6 +960,49 @@ export type GetAllCategoriesResponses = {
 };
 
 export type GetAllCategoriesResponse = GetAllCategoriesResponses[keyof GetAllCategoriesResponses];
+
+export type GetQuestionTemplatesData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/report-categories/{id}/question-templates';
+};
+
+export type GetQuestionTemplatesErrors = {
+    /**
+     * Category not found
+     */
+    404: Array<QuestionTemplateDto>;
+};
+
+export type GetQuestionTemplatesError = GetQuestionTemplatesErrors[keyof GetQuestionTemplatesErrors];
+
+export type GetQuestionTemplatesResponses = {
+    /**
+     * Successfully retrieved question templates
+     */
+    200: Array<QuestionTemplateDto>;
+};
+
+export type GetQuestionTemplatesResponse = GetQuestionTemplatesResponses[keyof GetQuestionTemplatesResponses];
+
+export type PingData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/ping';
+};
+
+export type PingResponses = {
+    /**
+     * OK
+     */
+    200: string;
+};
+
+export type PingResponse = PingResponses[keyof PingResponses];
 
 export type GetNotificationsData = {
     body?: never;
@@ -580,6 +1073,68 @@ export type GetSignatureResponses = {
 
 export type GetSignatureResponse = GetSignatureResponses[keyof GetSignatureResponses];
 
+export type GetClaimDetailsData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/claims/{id}';
+};
+
+export type GetClaimDetailsErrors = {
+    /**
+     * Not the challenge author
+     */
+    400: ClaimDetailsDto;
+    /**
+     * Claim not found
+     */
+    404: ClaimDetailsDto;
+};
+
+export type GetClaimDetailsError = GetClaimDetailsErrors[keyof GetClaimDetailsErrors];
+
+export type GetClaimDetailsResponses = {
+    /**
+     * Successfully retrieved claim
+     */
+    200: ClaimDetailsDto;
+};
+
+export type GetClaimDetailsResponse = GetClaimDetailsResponses[keyof GetClaimDetailsResponses];
+
+export type GetChallengeData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/challenges/{id}';
+};
+
+export type GetChallengeErrors = {
+    /**
+     * Not allowed to answer this challenge
+     */
+    400: ClaimantChallengeDto;
+    /**
+     * Challenge not found
+     */
+    404: ClaimantChallengeDto;
+};
+
+export type GetChallengeError = GetChallengeErrors[keyof GetChallengeErrors];
+
+export type GetChallengeResponses = {
+    /**
+     * Successfully retrieved challenge
+     */
+    200: ClaimantChallengeDto;
+};
+
+export type GetChallengeResponse = GetChallengeResponses[keyof GetChallengeResponses];
+
 export type GetAllUsersData = {
     body?: never;
     path?: never;
@@ -633,3 +1188,21 @@ export type GetReportById1Responses = {
 };
 
 export type GetReportById1Response = GetReportById1Responses[keyof GetReportById1Responses];
+
+export type GetClaimsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: ClaimStatus;
+    };
+    url: '/admin/claims';
+};
+
+export type GetClaimsResponses = {
+    /**
+     * OK
+     */
+    200: Array<AdminClaimListDto>;
+};
+
+export type GetClaimsResponse = GetClaimsResponses[keyof GetClaimsResponses];
