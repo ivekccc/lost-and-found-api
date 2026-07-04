@@ -120,6 +120,7 @@ export type ReportDetailsDto = {
     hasContactEmail: boolean;
     hasContactPhone: boolean;
     images?: Array<ReportImageDto>;
+    challengeId?: number;
 };
 
 export type ReportImageDto = {
@@ -293,6 +294,7 @@ export type ReportContactDto = {
 export type ReportCategoryDto = {
     id: number;
     name: string;
+    minQuestions: number;
 };
 
 export type QuestionTemplateDto = {
@@ -326,10 +328,10 @@ export enum NotificationType {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
