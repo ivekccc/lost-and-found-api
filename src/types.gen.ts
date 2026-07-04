@@ -224,6 +224,7 @@ export type ClaimDto = {
     id: number;
     challengeId: number;
     reportId: number;
+    reportTitle: string;
     status: ClaimStatus;
     message?: string;
     photoUrl?: string;
