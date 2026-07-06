@@ -287,6 +287,16 @@ export type ReportListDto = {
     thumbnailUrl?: string;
 };
 
+export type ReportChallengeDto = {
+    id: number;
+    finderDisplayName: string;
+    createdAt: string;
+    questionCount: number;
+    myClaimId?: number;
+    myClaimStatus?: ClaimStatus;
+    attemptsUsed: number;
+};
+
 export type ReportContactDto = {
     contactEmail?: string;
     contactPhone?: string;
@@ -578,6 +588,37 @@ export type CreateReportResponses = {
 };
 
 export type CreateReportResponse = CreateReportResponses[keyof CreateReportResponses];
+
+export type GetChallengesForReportData = {
+    body?: never;
+    path: {
+        reportId: number;
+    };
+    query?: never;
+    url: '/reports/{reportId}/challenges';
+};
+
+export type GetChallengesForReportErrors = {
+    /**
+     * Not a lost report or not the report owner
+     */
+    400: Array<ReportChallengeDto>;
+    /**
+     * Report not found
+     */
+    404: Array<ReportChallengeDto>;
+};
+
+export type GetChallengesForReportError = GetChallengesForReportErrors[keyof GetChallengesForReportErrors];
+
+export type GetChallengesForReportResponses = {
+    /**
+     * Successfully retrieved challenges
+     */
+    200: Array<ReportChallengeDto>;
+};
+
+export type GetChallengesForReportResponse = GetChallengesForReportResponses[keyof GetChallengesForReportResponses];
 
 export type CreateChallengeData = {
     body: CreateChallengeRequestDto;
