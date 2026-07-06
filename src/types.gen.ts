@@ -339,30 +339,30 @@ export enum NotificationType {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
-    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
 export type PageableObject = {
+    offset?: number;
+    sort?: SortObject;
+    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
-    unpaged?: boolean;
-    offset?: number;
-    sort?: SortObject;
 };
 
 export type SortObject = {
-    sorted?: boolean;
-    unsorted?: boolean;
     empty?: boolean;
+    unsorted?: boolean;
+    sorted?: boolean;
 };
 
 export type UnreadCountDto = {
@@ -988,6 +988,22 @@ export type RevealContactResponses = {
 };
 
 export type RevealContactResponse = RevealContactResponses[keyof RevealContactResponses];
+
+export type GetMyReportsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/reports/mine';
+};
+
+export type GetMyReportsResponses = {
+    /**
+     * OK
+     */
+    200: Array<ReportListDto>;
+};
+
+export type GetMyReportsResponse = GetMyReportsResponses[keyof GetMyReportsResponses];
 
 export type GetAllCategoriesData = {
     body?: never;
