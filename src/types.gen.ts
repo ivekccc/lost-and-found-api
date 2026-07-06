@@ -297,11 +297,6 @@ export type ReportChallengeDto = {
     attemptsUsed: number;
 };
 
-export type ReportContactDto = {
-    contactEmail?: string;
-    contactPhone?: string;
-};
-
 export type ReportCategoryDto = {
     id: number;
     name: string;
@@ -339,30 +334,30 @@ export enum NotificationType {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    size?: number;
-    content?: Array<NotificationDto>;
-    number?: number;
-    sort?: SortObject;
     pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    size?: number;
+    content?: Array<NotificationDto>;
+    number?: number;
+    sort?: SortObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
     unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    offset?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
-    empty?: boolean;
     unsorted?: boolean;
     sorted?: boolean;
+    empty?: boolean;
 };
 
 export type UnreadCountDto = {
@@ -970,24 +965,6 @@ export type GetReportByIdResponses = {
 };
 
 export type GetReportByIdResponse = GetReportByIdResponses[keyof GetReportByIdResponses];
-
-export type RevealContactData = {
-    body?: never;
-    path: {
-        id: number;
-    };
-    query?: never;
-    url: '/reports/{id}/contact';
-};
-
-export type RevealContactResponses = {
-    /**
-     * OK
-     */
-    200: ReportContactDto;
-};
-
-export type RevealContactResponse = RevealContactResponses[keyof RevealContactResponses];
 
 export type GetMyReportsData = {
     body?: never;
