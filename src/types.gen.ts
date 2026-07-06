@@ -25,6 +25,11 @@ export type UpdateMinQuestionsRequestDto = {
     minQuestions: number;
 };
 
+export type UpdateCategoryImageRequestDto = {
+    imageUrl: string;
+    imagePublicId: string;
+};
+
 export enum QuestionKind {
     TEXT = 'TEXT',
     CHOICE = 'CHOICE'
@@ -111,6 +116,7 @@ export type ReportDetailsDto = {
     type: ReportType;
     categoryId: number;
     categoryName: string;
+    categoryImageUrl?: string;
     status: ReportStatus;
     location: LocationDto;
     createdAt: string;
@@ -281,6 +287,7 @@ export type ReportListDto = {
     title: string;
     type: ReportType;
     categoryName: string;
+    categoryImageUrl?: string;
     status: ReportStatus;
     location: LocationDto;
     createdAt: string;
@@ -301,6 +308,7 @@ export type ReportCategoryDto = {
     id: number;
     name: string;
     minQuestions: number;
+    imageUrl?: string;
 };
 
 export type QuestionTemplateDto = {
@@ -509,6 +517,22 @@ export type UpdateMinQuestionsData = {
 };
 
 export type UpdateMinQuestionsResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type UpdateCategoryImageData = {
+    body: UpdateCategoryImageRequestDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/report-categories/{id}/image';
+};
+
+export type UpdateCategoryImageResponses = {
     /**
      * OK
      */
