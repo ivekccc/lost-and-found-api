@@ -343,9 +343,9 @@ export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
     pageable?: PageableObject;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -354,17 +354,17 @@ export type PageNotificationDto = {
 };
 
 export type PageableObject = {
-    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    unpaged?: boolean;
     offset?: number;
     sort?: SortObject;
 };
 
 export type SortObject = {
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
     empty?: boolean;
 };
 
@@ -427,7 +427,7 @@ export type UserListDto = {
     firstName: string;
     lastName: string;
     phoneNumber?: string;
-    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED';
+    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED' | 'DELETED';
     role: UserRole;
     createdAt: string;
 };
@@ -439,7 +439,7 @@ export type UserDetailsDto = {
     firstName: string;
     lastName: string;
     phoneNumber?: string;
-    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED';
+    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED' | 'DELETED';
     role: UserRole;
     createdAt: string;
 };
@@ -474,6 +474,33 @@ export type AdminClaimListDto = {
     submittedAt: string;
     decidedAt?: string;
 };
+
+export type DeleteAccountRequestDto = {
+    password: string;
+};
+
+export type DeleteAccountData = {
+    body: DeleteAccountRequestDto;
+    path?: never;
+    query?: never;
+    url: '/users/me';
+};
+
+export type DeleteAccountErrors = {
+    /**
+     * Wrong password
+     */
+    401: unknown;
+};
+
+export type DeleteAccountResponses = {
+    /**
+     * Account deleted
+     */
+    204: void;
+};
+
+export type DeleteAccountResponse = DeleteAccountResponses[keyof DeleteAccountResponses];
 
 export type GetProfileData = {
     body?: never;
@@ -1213,6 +1240,22 @@ export type GetAllUsersResponses = {
 };
 
 export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];
+
+export type DeleteUserData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/users/{id}';
+};
+
+export type DeleteUserResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
 
 export type GetUserByIdData = {
     body?: never;
