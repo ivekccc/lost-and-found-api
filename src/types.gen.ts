@@ -127,6 +127,7 @@ export type ReportDetailsDto = {
     hasContactPhone: boolean;
     images?: Array<ReportImageDto>;
     challengeId?: number;
+    reported: boolean;
 };
 
 export type ReportImageDto = {
@@ -282,6 +283,49 @@ export type CreateQuestionTemplateRequestDto = {
     defaultChoices?: Array<string>;
 };
 
+export enum AbuseReason {
+    SCAM = 'SCAM',
+    SPAM = 'SPAM',
+    OFFENSIVE = 'OFFENSIVE',
+    PERSONAL_INFO = 'PERSONAL_INFO',
+    WRONG_CATEGORY = 'WRONG_CATEGORY',
+    OTHER = 'OTHER'
+}
+
+export enum AbuseTargetType {
+    USER = 'USER',
+    REPORT = 'REPORT'
+}
+
+export type CreateAbuseReportRequestDto = {
+    targetType: AbuseTargetType;
+    targetId: number;
+    reason: AbuseReason;
+    message?: string;
+};
+
+export type AbuseReportDto = {
+    id: number;
+    reporterName: string;
+    targetType: AbuseTargetType;
+    targetUserId?: number;
+    targetReportId?: number;
+    targetLabel: string;
+    reason: AbuseReason;
+    message?: string;
+    status: AbuseReportStatus;
+    createdAt: string;
+    reviewedByName?: string;
+    reviewedAt?: string;
+    resolutionNote?: string;
+};
+
+export enum AbuseReportStatus {
+    PENDING = 'PENDING',
+    REVIEWED_ACTIONED = 'REVIEWED_ACTIONED',
+    DISMISSED = 'DISMISSED'
+}
+
 export type ReportListDto = {
     id: number;
     title: string;
@@ -292,6 +336,7 @@ export type ReportListDto = {
     location: LocationDto;
     createdAt: string;
     thumbnailUrl?: string;
+    reported: boolean;
 };
 
 export type ReportChallengeDto = {
@@ -336,7 +381,9 @@ export enum NotificationType {
     CHALLENGE_CREATED = 'CHALLENGE_CREATED',
     CLAIM_SUBMITTED = 'CLAIM_SUBMITTED',
     CLAIM_APPROVED = 'CLAIM_APPROVED',
-    CLAIM_DECLINED = 'CLAIM_DECLINED'
+    CLAIM_DECLINED = 'CLAIM_DECLINED',
+    ACCOUNT_BLOCKED = 'ACCOUNT_BLOCKED',
+    ACCOUNT_PARTIALLY_BLOCKED = 'ACCOUNT_PARTIALLY_BLOCKED'
 }
 
 export type PageNotificationDto = {
@@ -903,6 +950,86 @@ export type LoginResponses = {
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
 
+export type UnblockUserData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/users/{id}/unblock';
+};
+
+export type UnblockUserResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type PartialBlockUserData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/users/{id}/partial-block';
+};
+
+export type PartialBlockUserResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type BlockUserData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/users/{id}/block';
+};
+
+export type BlockUserResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type UnflagReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/reports/{id}/unflag';
+};
+
+export type UnflagReportResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
+export type FlagReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/reports/{id}/flag';
+};
+
+export type FlagReportResponses = {
+    /**
+     * OK
+     */
+    200: unknown;
+};
+
 export type GetTemplatesData = {
     body?: never;
     path?: never;
@@ -936,6 +1063,64 @@ export type CreateTemplateResponses = {
 };
 
 export type CreateTemplateResponse = CreateTemplateResponses[keyof CreateTemplateResponses];
+
+export type DismissData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/abuse-reports/{id}/dismiss';
+};
+
+export type DismissErrors = {
+    /**
+     * Abuse report not found
+     */
+    404: unknown;
+};
+
+export type DismissResponses = {
+    /**
+     * Report dismissed
+     */
+    204: void;
+};
+
+export type DismissResponse = DismissResponses[keyof DismissResponses];
+
+export type ReportData = {
+    body: CreateAbuseReportRequestDto;
+    path?: never;
+    query?: never;
+    url: '/abuse-reports';
+};
+
+export type ReportErrors = {
+    /**
+     * Invalid report (self-report, duplicate open report)
+     */
+    400: AbuseReportDto;
+    /**
+     * Target not found
+     */
+    404: AbuseReportDto;
+    /**
+     * Daily report limit reached
+     */
+    429: AbuseReportDto;
+};
+
+export type ReportError = ReportErrors[keyof ReportErrors];
+
+export type ReportResponses = {
+    /**
+     * Report submitted
+     */
+    201: AbuseReportDto;
+};
+
+export type ReportResponse = ReportResponses[keyof ReportResponses];
 
 export type MarkAsReadData = {
     body?: never;
@@ -1310,3 +1495,21 @@ export type GetClaimsResponses = {
 };
 
 export type GetClaimsResponse = GetClaimsResponses[keyof GetClaimsResponses];
+
+export type GetReports1Data = {
+    body?: never;
+    path?: never;
+    query?: {
+        status?: AbuseReportStatus;
+    };
+    url: '/admin/abuse-reports';
+};
+
+export type GetReports1Responses = {
+    /**
+     * Successfully retrieved abuse reports
+     */
+    200: Array<AbuseReportDto>;
+};
+
+export type GetReports1Response = GetReports1Responses[keyof GetReports1Responses];
