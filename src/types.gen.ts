@@ -254,6 +254,10 @@ export type AuthResponseDto = {
     role: string;
 };
 
+export type ResendCodeRequestDto = {
+    email: string;
+};
+
 export type RegisterRequestDto = {
     email: string;
     username: string;
@@ -914,6 +918,22 @@ export type VerifyResponses = {
 };
 
 export type VerifyResponse = VerifyResponses[keyof VerifyResponses];
+
+export type ResendData = {
+    body: ResendCodeRequestDto;
+    path?: never;
+    query?: never;
+    url: '/auth/resend';
+};
+
+export type ResendResponses = {
+    /**
+     * Verification code sent successfully
+     */
+    204: void;
+};
+
+export type ResendResponse = ResendResponses[keyof ResendResponses];
 
 export type RegisterData = {
     body: RegisterRequestDto;
