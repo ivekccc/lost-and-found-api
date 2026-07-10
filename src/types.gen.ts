@@ -17,6 +17,8 @@ export type UserProfileDto = {
     firstName: string;
     lastName: string;
     phoneNumber?: string;
+    avatarUrl?: string;
+    googleLinked: boolean;
     createdAt: string;
     role: string;
 };
@@ -276,6 +278,10 @@ export type AuthRequestDto = {
     password: string;
 };
 
+export type GoogleAuthRequestDto = {
+    idToken: string;
+};
+
 export type CreateQuestionTemplateRequestDto = {
     categoryId: number;
     prompt: string;
@@ -387,12 +393,12 @@ export enum NotificationType {
 }
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    numberOfElements?: number;
+    totalPages?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -523,7 +529,14 @@ export type AdminClaimListDto = {
 };
 
 export type DeleteAccountRequestDto = {
-    password: string;
+    /**
+     * Current password; required unless googleIdToken is provided
+     */
+    password?: string;
+    /**
+     * Fresh Google ID token; alternative confirmation for Google-linked accounts
+     */
+    googleIdToken?: string;
 };
 
 export type DeleteAccountData = {
@@ -535,7 +548,7 @@ export type DeleteAccountData = {
 
 export type DeleteAccountErrors = {
     /**
-     * Wrong password
+     * Wrong password or Google confirmation
      */
     401: unknown;
 };
@@ -949,6 +962,22 @@ export type LoginResponses = {
 };
 
 export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type GoogleData = {
+    body: GoogleAuthRequestDto;
+    path?: never;
+    query?: never;
+    url: '/auth/google';
+};
+
+export type GoogleResponses = {
+    /**
+     * OK
+     */
+    200: AuthResponseDto;
+};
+
+export type GoogleResponse = GoogleResponses[keyof GoogleResponses];
 
 export type UnblockUserData = {
     body?: never;
