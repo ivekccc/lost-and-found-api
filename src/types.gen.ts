@@ -254,6 +254,12 @@ export type AuthResponseDto = {
     role: string;
 };
 
+export type ResetPasswordRequestDto = {
+    email: string;
+    code: string;
+    newPassword: string;
+};
+
 export type ResendCodeRequestDto = {
     email: string;
 };
@@ -284,6 +290,10 @@ export type AuthRequestDto = {
 
 export type GoogleAuthRequestDto = {
     idToken: string;
+};
+
+export type ForgotPasswordRequestDto = {
+    email: string;
 };
 
 export type CreateQuestionTemplateRequestDto = {
@@ -397,12 +407,12 @@ export enum NotificationType {
 }
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
-    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -919,6 +929,29 @@ export type VerifyResponses = {
 
 export type VerifyResponse = VerifyResponses[keyof VerifyResponses];
 
+export type ResetPasswordData = {
+    body: ResetPasswordRequestDto;
+    path?: never;
+    query?: never;
+    url: '/auth/reset-password';
+};
+
+export type ResetPasswordErrors = {
+    /**
+     * Invalid or expired code
+     */
+    400: unknown;
+};
+
+export type ResetPasswordResponses = {
+    /**
+     * Password updated
+     */
+    204: void;
+};
+
+export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
+
 export type ResendData = {
     body: ResendCodeRequestDto;
     path?: never;
@@ -998,6 +1031,22 @@ export type GoogleResponses = {
 };
 
 export type GoogleResponse = GoogleResponses[keyof GoogleResponses];
+
+export type ForgotPasswordData = {
+    body: ForgotPasswordRequestDto;
+    path?: never;
+    query?: never;
+    url: '/auth/forgot-password';
+};
+
+export type ForgotPasswordResponses = {
+    /**
+     * Request accepted
+     */
+    204: void;
+};
+
+export type ForgotPasswordResponse = ForgotPasswordResponses[keyof ForgotPasswordResponses];
 
 export type UnblockUserData = {
     body?: never;
