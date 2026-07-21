@@ -369,6 +369,20 @@ export type ReportChallengeDto = {
     attemptsUsed: number;
 };
 
+export type NearbyReportDto = {
+    id: number;
+    title: string;
+    type: ReportType;
+    categoryName: string;
+    categoryImageUrl?: string;
+    status: ReportStatus;
+    location: LocationDto;
+    createdAt: string;
+    thumbnailUrl?: string;
+    reported: boolean;
+    distanceKm: number;
+};
+
 export type ReportCategoryDto = {
     id: number;
     name: string;
@@ -1299,6 +1313,26 @@ export type GetReportByIdResponses = {
 };
 
 export type GetReportByIdResponse = GetReportByIdResponses[keyof GetReportByIdResponses];
+
+export type GetNearbyReportsData = {
+    body?: never;
+    path?: never;
+    query: {
+        latitude: number;
+        longitude: number;
+        radiusKm?: number;
+    };
+    url: '/reports/nearby';
+};
+
+export type GetNearbyReportsResponses = {
+    /**
+     * OK
+     */
+    200: Array<NearbyReportDto>;
+};
+
+export type GetNearbyReportsResponse = GetNearbyReportsResponses[keyof GetNearbyReportsResponses];
 
 export type GetMyReportsData = {
     body?: never;
