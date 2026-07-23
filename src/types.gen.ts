@@ -357,6 +357,7 @@ export type ReportListDto = {
     createdAt: string;
     thumbnailUrl?: string;
     reported: boolean;
+    matchCount?: number;
 };
 
 export type ReportChallengeDto = {
@@ -368,6 +369,36 @@ export type ReportChallengeDto = {
     myClaimStatus?: ClaimStatus;
     attemptsUsed: number;
 };
+
+export type MatchDto = {
+    id: number;
+    score: number;
+    distanceKm: number;
+    distanceScore: number;
+    timeGapDays: number;
+    timeScore: number;
+    textScore: number;
+    status: ReportMatchStatus;
+    createdAt: string;
+    myReport: MatchReportSummaryDto;
+    otherReport: MatchReportSummaryDto;
+};
+
+export type MatchReportSummaryDto = {
+    id: number;
+    title: string;
+    type: ReportType;
+    categoryName: string;
+    categoryImageUrl?: string;
+    status: ReportStatus;
+    location: LocationDto;
+    createdAt: string;
+    thumbnailUrl?: string;
+};
+
+export enum ReportMatchStatus {
+    SUGGESTED = 'SUGGESTED'
+}
 
 export type NearbyReportDto = {
     id: number;
@@ -397,18 +428,7 @@ export type QuestionTemplateDto = {
     defaultChoices?: Array<string>;
 };
 
-export type NotificationDto = {
-    id: number;
-    type: NotificationType;
-    title: string;
-    body: string;
-    dataJson?: string;
-    isRead: boolean;
-    createdAt: string;
-};
-
 export enum NotificationType {
-    REPORT_CREATED = 'REPORT_CREATED',
     MATCH_FOUND = 'MATCH_FOUND',
     REPORT_EXPIRED = 'REPORT_EXPIRED',
     REPORT_RESOLVED = 'REPORT_RESOLVED',
@@ -420,33 +440,43 @@ export enum NotificationType {
     ACCOUNT_PARTIALLY_BLOCKED = 'ACCOUNT_PARTIALLY_BLOCKED'
 }
 
+export type NotificationDto = {
+    id: number;
+    type: NotificationType;
+    title: string;
+    body: string;
+    dataJson?: string;
+    isRead: boolean;
+    createdAt: string;
+};
+
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
+    offset?: number;
+    sort?: SortObject;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
-    offset?: number;
-    sort?: SortObject;
 };
 
 export type SortObject = {
+    empty?: boolean;
     sorted?: boolean;
     unsorted?: boolean;
-    empty?: boolean;
 };
 
 export type UnreadCountDto = {
@@ -541,6 +571,43 @@ export type AdminReportDetailsDto = {
     contactEmail?: string;
     contactPhone?: string;
     images?: Array<ReportImageDto>;
+};
+
+export type AdminMatchListDto = {
+    id: number;
+    score: number;
+    distanceKm: number;
+    distanceScore: number;
+    timeGapDays: number;
+    timeScore: number;
+    textSimilarity: number;
+    textScore: number;
+    status: ReportMatchStatus;
+    lostReportId: number;
+    lostReportTitle: string;
+    lostReportStatus: ReportStatus;
+    foundReportId: number;
+    foundReportTitle: string;
+    foundReportStatus: ReportStatus;
+    lostDismissedAt?: string;
+    foundDismissedAt?: string;
+    notifiedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+export type PageAdminMatchListDto = {
+    totalElements?: number;
+    totalPages?: number;
+    size?: number;
+    content?: Array<AdminMatchListDto>;
+    number?: number;
+    sort?: SortObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
+    pageable?: PageableObject;
+    empty?: boolean;
 };
 
 export type AdminClaimListDto = {
@@ -798,6 +865,24 @@ export type RegisterTokenResponses = {
      */
     200: unknown;
 };
+
+export type DismissMatchData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/matches/{id}/dismiss';
+};
+
+export type DismissMatchResponses = {
+    /**
+     * Match dismissed
+     */
+    204: void;
+};
+
+export type DismissMatchResponse = DismissMatchResponses[keyof DismissMatchResponses];
 
 export type DeclineClaimData = {
     body?: never;
@@ -1314,6 +1399,24 @@ export type GetReportByIdResponses = {
 
 export type GetReportByIdResponse = GetReportByIdResponses[keyof GetReportByIdResponses];
 
+export type GetReportMatchesData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/matches';
+};
+
+export type GetReportMatchesResponses = {
+    /**
+     * OK
+     */
+    200: Array<MatchDto>;
+};
+
+export type GetReportMatchesResponse = GetReportMatchesResponses[keyof GetReportMatchesResponses];
+
 export type GetNearbyReportsData = {
     body?: never;
     path?: never;
@@ -1415,6 +1518,7 @@ export type GetNotificationsData = {
     query?: {
         page?: number;
         size?: number;
+        types?: Array<NotificationType>;
     };
     url: '/notifications';
 };
@@ -1443,6 +1547,24 @@ export type GetUnreadCountResponses = {
 };
 
 export type GetUnreadCountResponse = GetUnreadCountResponses[keyof GetUnreadCountResponses];
+
+export type GetMyMatchesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        limit?: number;
+    };
+    url: '/matches/mine';
+};
+
+export type GetMyMatchesResponses = {
+    /**
+     * Matches returned
+     */
+    200: Array<MatchDto>;
+};
+
+export type GetMyMatchesResponse = GetMyMatchesResponses[keyof GetMyMatchesResponses];
 
 export type AutocompleteData = {
     body?: never;
@@ -1609,6 +1731,27 @@ export type GetReportById1Responses = {
 };
 
 export type GetReportById1Response = GetReportById1Responses[keyof GetReportById1Responses];
+
+export type GetMatchesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        page?: number;
+        size?: number;
+        status?: ReportMatchStatus;
+        minScore?: number;
+    };
+    url: '/admin/matches';
+};
+
+export type GetMatchesResponses = {
+    /**
+     * OK
+     */
+    200: PageAdminMatchListDto;
+};
+
+export type GetMatchesResponse = GetMatchesResponses[keyof GetMatchesResponses];
 
 export type GetClaimsData = {
     body?: never;
