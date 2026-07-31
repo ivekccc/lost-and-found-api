@@ -511,9 +511,9 @@ export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
     pageable?: PageableObject;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -553,7 +553,7 @@ export type CloudinarySignatureDto = {
     timestamp: number;
     cloudName: string;
     apiKey: string;
-    folder: string;
+    publicId: string;
 };
 
 export type ClaimantChallengeDto = {
@@ -669,9 +669,9 @@ export type PageAdminMatchListDto = {
     totalPages?: number;
     totalElements?: number;
     pageable?: PageableObject;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
