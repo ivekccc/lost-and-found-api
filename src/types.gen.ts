@@ -1015,6 +1015,37 @@ export type DismissMatchResponses = {
 
 export type DismissMatchResponse = DismissMatchResponses[keyof DismissMatchResponses];
 
+export type WithdrawClaimData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/claims/{id}/withdraw';
+};
+
+export type WithdrawClaimErrors = {
+    /**
+     * Claim has already been decided
+     */
+    400: ClaimDetailsDto;
+    /**
+     * Claim not found or not submitted by the caller
+     */
+    404: ClaimDetailsDto;
+};
+
+export type WithdrawClaimError = WithdrawClaimErrors[keyof WithdrawClaimErrors];
+
+export type WithdrawClaimResponses = {
+    /**
+     * Claim withdrawn
+     */
+    200: ClaimDetailsDto;
+};
+
+export type WithdrawClaimResponse = WithdrawClaimResponses[keyof WithdrawClaimResponses];
+
 export type DeclineClaimData = {
     body?: never;
     path: {
@@ -1511,6 +1542,35 @@ export type SecretResponses = {
 };
 
 export type SecretResponse = SecretResponses[keyof SecretResponses];
+
+export type DeleteReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}';
+};
+
+export type DeleteReportErrors = {
+    /**
+     * Report is already deleted
+     */
+    400: unknown;
+    /**
+     * Report not found or not owned by the caller
+     */
+    404: unknown;
+};
+
+export type DeleteReportResponses = {
+    /**
+     * Report deleted
+     */
+    204: void;
+};
+
+export type DeleteReportResponse = DeleteReportResponses[keyof DeleteReportResponses];
 
 export type GetReportByIdData = {
     body?: never;
