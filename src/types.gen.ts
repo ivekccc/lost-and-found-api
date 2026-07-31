@@ -195,7 +195,7 @@ export type ReportZoneDto = {
      */
     parentName?: string;
     /**
-     * Zone boundary as a GeoJSON MultiPolygon geometry object. Always a MultiPolygon, never a bare Polygon, so clients need a single parsing path. Municipalities are simplified for display; finer zones are sent as stored, because display-level simplification would visibly deform a polygon this small.
+     * Zone boundary as a GeoJSON MultiPolygon geometry object. Always a MultiPolygon, never a bare Polygon, so clients need a single parsing path. Zones larger than 2 km² are simplified for display; smaller ones are sent as stored, because display-level simplification would visibly deform a polygon that small. The threshold is on area rather than administrative level, since a rural settlement can be far larger than a city municipality.
      */
     boundaryGeoJson: string;
 };
@@ -510,30 +510,30 @@ export type NotificationDto = {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
+    offset?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
-    empty?: boolean;
     sorted?: boolean;
     unsorted?: boolean;
+    empty?: boolean;
 };
 
 export type UnreadCountDto = {
@@ -668,14 +668,14 @@ export type AdminMatchListDto = {
 export type PageAdminMatchListDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
-    pageable?: PageableObject;
     empty?: boolean;
 };
 
@@ -920,6 +920,68 @@ export type CreateChallengeResponses = {
 };
 
 export type CreateChallengeResponse = CreateChallengeResponses[keyof CreateChallengeResponses];
+
+export type ReopenReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/reopen';
+};
+
+export type ReopenReportErrors = {
+    /**
+     * Report is not closed
+     */
+    400: ReportDetailsDto;
+    /**
+     * Report not found or not owned by the caller
+     */
+    404: ReportDetailsDto;
+};
+
+export type ReopenReportError = ReopenReportErrors[keyof ReopenReportErrors];
+
+export type ReopenReportResponses = {
+    /**
+     * Report reopened
+     */
+    200: ReportDetailsDto;
+};
+
+export type ReopenReportResponse = ReopenReportResponses[keyof ReopenReportResponses];
+
+export type CloseReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/close';
+};
+
+export type CloseReportErrors = {
+    /**
+     * Report is not active
+     */
+    400: ReportDetailsDto;
+    /**
+     * Report not found or not owned by the caller
+     */
+    404: ReportDetailsDto;
+};
+
+export type CloseReportError = CloseReportErrors[keyof CloseReportErrors];
+
+export type CloseReportResponses = {
+    /**
+     * Report closed
+     */
+    200: ReportDetailsDto;
+};
+
+export type CloseReportResponse = CloseReportResponses[keyof CloseReportResponses];
 
 export type RegisterTokenData = {
     body: FcmTokenRequestDto;
