@@ -102,12 +102,28 @@ export enum ReportType {
     FOUND = 'FOUND'
 }
 
+export enum ClaimStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    DECLINED = 'DECLINED',
+    WITHDRAWN = 'WITHDRAWN'
+}
+
 /**
  * Location data
  */
 export type LocationDto = {
+    /**
+     * Exact latitude. Null for everyone except the report owner (and after their ownership claim is approved) — see the zonal location view.
+     */
     latitude?: number;
+    /**
+     * Exact longitude. Null for everyone except the report owner (and after their ownership claim is approved) — see the zonal location view.
+     */
     longitude?: number;
+    /**
+     * Full street address for the owner; just the zone name (e.g. "Mirijevo, Zvezdara") for everyone else.
+     */
     formattedAddress?: string;
 };
 
@@ -120,7 +136,7 @@ export type ReportDetailsDto = {
     categoryName: string;
     categoryImageUrl?: string;
     status: ReportStatus;
-    location: LocationDto;
+    location?: LocationDto;
     createdAt: string;
     expiresAt?: string;
     userId: number;
@@ -128,8 +144,29 @@ export type ReportDetailsDto = {
     hasContactEmail: boolean;
     hasContactPhone: boolean;
     images?: Array<ReportImageDto>;
+    /**
+     * Id of the challenge the report OWNER created on their own found report. Only ever set for FOUND reports; this is the challenge a claimant answers.
+     */
     challengeId?: number;
+    /**
+     * Id of the challenge the VIEWER created on this report as a finder. Only ever set for LOST reports. Present means the viewer already sent verification questions, so they must not be offered the action again — and they are the one allowed to review the claims on it.
+     */
+    myChallengeId?: number;
+    /**
+     * Id of the viewer's most recent ownership claim on this report's challenge. Absent when the viewer has never claimed.
+     */
+    myClaimId?: number;
+    myClaimStatus?: ClaimStatus;
+    /**
+     * How many claims the viewer has already submitted on this report's challenge.
+     */
+    myClaimAttemptsUsed: number;
+    /**
+     * Server-side cap on claim attempts per challenge. Sent so clients do not duplicate the rule and drift from it.
+     */
+    maxClaimAttempts: number;
     reported: boolean;
+    zone?: ReportZoneDto;
 };
 
 export type ReportImageDto = {
@@ -146,6 +183,22 @@ export enum ReportStatus {
     FLAGGED = 'FLAGGED',
     DELETED = 'DELETED'
 }
+
+/**
+ * Administrative zone a report belongs to, with its boundary for map display. Usually a local community (mesna zajednica) or settlement of about 1 km²; falls back to the Belgrade city municipality where no finer unit covers the point, such as parks, riverbanks and industrial land.
+ */
+export type ReportZoneDto = {
+    name: string;
+    city: string;
+    /**
+     * Name of the containing city municipality, e.g. "Zvezdara" for the "Mirijevo" zone. Absent when the zone IS a municipality, which happens where no finer unit covers the location.
+     */
+    parentName?: string;
+    /**
+     * Zone boundary as a GeoJSON MultiPolygon geometry object. Always a MultiPolygon, never a bare Polygon, so clients need a single parsing path. Municipalities are simplified for display; finer zones are sent as stored, because display-level simplification would visibly deform a polygon this small.
+     */
+    boundaryGeoJson: string;
+};
 
 export type CreateChallengeRequestDto = {
     questions: Array<ChallengeQuestionRequestDto>;
@@ -198,13 +251,6 @@ export type ClaimReviewAnswerDto = {
     expectedAnswer?: string;
 };
 
-export enum ClaimStatus {
-    PENDING = 'PENDING',
-    APPROVED = 'APPROVED',
-    DECLINED = 'DECLINED',
-    WITHDRAWN = 'WITHDRAWN'
-}
-
 export type RevealedContactDto = {
     name?: string;
     email: string;
@@ -244,6 +290,7 @@ export type ClaimDto = {
 };
 
 export type VerifyRequestDto = {
+    email: string;
     code: string;
 };
 
@@ -353,7 +400,7 @@ export type ReportListDto = {
     categoryName: string;
     categoryImageUrl?: string;
     status: ReportStatus;
-    location: LocationDto;
+    location?: LocationDto;
     createdAt: string;
     thumbnailUrl?: string;
     reported: boolean;
@@ -370,14 +417,24 @@ export type ReportChallengeDto = {
     attemptsUsed: number;
 };
 
+/**
+ * How far apart the two reports' zones are, as a band rather than a number. Measured between zone centroids, never between exact locations, so a one-decimal figure would look far more precise than it is. Absent both when the two reports share the same zone (compare the zone names on myReport/otherReport) and when either report's zone is unknown.
+ */
+export enum DistanceBand {
+    UNDER_1_KM = 'UNDER_1_KM',
+    FROM_1_TO_2_KM = 'FROM_1_TO_2_KM',
+    FROM_2_TO_5_KM = 'FROM_2_TO_5_KM',
+    OVER_5_KM = 'OVER_5_KM'
+}
+
 export type MatchDto = {
     id: number;
+    /**
+     * Match strength 0-100, rounded to the nearest 10 so it cannot be used to recover a more precise location than the zone.
+     */
     score: number;
-    distanceKm: number;
-    distanceScore: number;
+    distanceBand?: DistanceBand;
     timeGapDays: number;
-    timeScore: number;
-    textScore: number;
     status: ReportMatchStatus;
     createdAt: string;
     myReport: MatchReportSummaryDto;
@@ -391,7 +448,7 @@ export type MatchReportSummaryDto = {
     categoryName: string;
     categoryImageUrl?: string;
     status: ReportStatus;
-    location: LocationDto;
+    location?: LocationDto;
     createdAt: string;
     thumbnailUrl?: string;
 };
@@ -407,11 +464,11 @@ export type NearbyReportDto = {
     categoryName: string;
     categoryImageUrl?: string;
     status: ReportStatus;
-    location: LocationDto;
+    location?: LocationDto;
     createdAt: string;
     thumbnailUrl?: string;
     reported: boolean;
-    distanceKm: number;
+    distanceBand?: DistanceBand;
 };
 
 export type ReportCategoryDto = {
@@ -451,8 +508,8 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -555,6 +612,18 @@ export type UserDetailsDto = {
     createdAt: string;
 };
 
+export type AdminReportListDto = {
+    id: number;
+    title: string;
+    type: ReportType;
+    categoryName: string;
+    status: ReportStatus;
+    location?: LocationDto;
+    createdAt: string;
+    ownerId: number;
+    ownerName?: string;
+};
+
 export type AdminReportDetailsDto = {
     id: number;
     title: string;
@@ -563,7 +632,7 @@ export type AdminReportDetailsDto = {
     categoryId: number;
     categoryName: string;
     status: ReportStatus;
-    location: LocationDto;
+    location?: LocationDto;
     createdAt: string;
     expiresAt?: string;
     userId: number;
@@ -597,8 +666,8 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
@@ -1714,6 +1783,25 @@ export type GetUserByIdResponses = {
 
 export type GetUserByIdResponse = GetUserByIdResponses[keyof GetUserByIdResponses];
 
+export type GetReports1Data = {
+    body?: never;
+    path?: never;
+    query?: {
+        type?: ReportType;
+        status?: ReportStatus;
+    };
+    url: '/admin/reports';
+};
+
+export type GetReports1Responses = {
+    /**
+     * Reports returned
+     */
+    200: Array<AdminReportListDto>;
+};
+
+export type GetReports1Response = GetReports1Responses[keyof GetReports1Responses];
+
 export type GetReportById1Data = {
     body?: never;
     path: {
@@ -1771,7 +1859,7 @@ export type GetClaimsResponses = {
 
 export type GetClaimsResponse = GetClaimsResponses[keyof GetClaimsResponses];
 
-export type GetReports1Data = {
+export type GetReports2Data = {
     body?: never;
     path?: never;
     query?: {
@@ -1780,11 +1868,11 @@ export type GetReports1Data = {
     url: '/admin/abuse-reports';
 };
 
-export type GetReports1Responses = {
+export type GetReports2Responses = {
     /**
      * Successfully retrieved abuse reports
      */
     200: Array<AbuseReportDto>;
 };
 
-export type GetReports1Response = GetReports1Responses[keyof GetReports1Responses];
+export type GetReports2Response = GetReports2Responses[keyof GetReports2Responses];
