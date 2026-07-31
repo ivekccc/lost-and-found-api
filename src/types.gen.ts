@@ -371,20 +371,15 @@ export type CreateAbuseReportRequestDto = {
     message?: string;
 };
 
-export type AbuseReportDto = {
+/**
+ * Confirmation that a report was filed. Deliberately excludes any detail about the reported target beyond what the reporter already supplied.
+ */
+export type AbuseReportReceiptDto = {
     id: number;
-    reporterName: string;
     targetType: AbuseTargetType;
-    targetUserId?: number;
-    targetReportId?: number;
-    targetLabel: string;
     reason: AbuseReason;
-    message?: string;
     status: AbuseReportStatus;
     createdAt: string;
-    reviewedByName?: string;
-    reviewedAt?: string;
-    resolutionNote?: string;
 };
 
 export enum AbuseReportStatus {
@@ -508,12 +503,12 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     pageable?: PageableObject;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -522,17 +517,17 @@ export type PageNotificationDto = {
 };
 
 export type PageableObject = {
+    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
-    unpaged?: boolean;
     offset?: number;
     sort?: SortObject;
 };
 
 export type SortObject = {
-    sorted?: boolean;
     unsorted?: boolean;
+    sorted?: boolean;
     empty?: boolean;
 };
 
@@ -666,12 +661,12 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
     pageable?: PageableObject;
-    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
@@ -690,6 +685,22 @@ export type AdminClaimListDto = {
     status: ClaimStatus;
     submittedAt: string;
     decidedAt?: string;
+};
+
+export type AbuseReportDto = {
+    id: number;
+    reporterName: string;
+    targetType: AbuseTargetType;
+    targetUserId?: number;
+    targetReportId?: number;
+    targetLabel: string;
+    reason: AbuseReason;
+    message?: string;
+    status: AbuseReportStatus;
+    createdAt: string;
+    reviewedByName?: string;
+    reviewedAt?: string;
+    resolutionNote?: string;
 };
 
 export type DeleteAccountRequestDto = {
@@ -1459,15 +1470,15 @@ export type ReportErrors = {
     /**
      * Invalid report (self-report, duplicate open report)
      */
-    400: AbuseReportDto;
+    400: AbuseReportReceiptDto;
     /**
      * Target not found
      */
-    404: AbuseReportDto;
+    404: AbuseReportReceiptDto;
     /**
      * Daily report limit reached
      */
-    429: AbuseReportDto;
+    429: AbuseReportReceiptDto;
 };
 
 export type ReportError = ReportErrors[keyof ReportErrors];
@@ -1476,7 +1487,7 @@ export type ReportResponses = {
     /**
      * Report submitted
      */
-    201: AbuseReportDto;
+    201: AbuseReportReceiptDto;
 };
 
 export type ReportResponse = ReportResponses[keyof ReportResponses];
