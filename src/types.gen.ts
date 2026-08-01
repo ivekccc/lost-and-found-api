@@ -908,6 +908,7 @@ export type GetReportsData = {
     path?: never;
     query?: {
         type?: ReportType;
+        categoryId?: number;
         search?: string;
     };
     url: '/reports';
@@ -915,7 +916,7 @@ export type GetReportsData = {
 
 export type GetReportsResponses = {
     /**
-     * OK
+     * Reports returned
      */
     200: Array<ReportListDto>;
 };
