@@ -420,6 +420,15 @@ export enum AbuseReportStatus {
     DISMISSED = 'DISMISSED'
 }
 
+/**
+ * How far back the search looks, counted from the moment of the request.
+ */
+export enum TimeWindow {
+    LAST_24_HOURS = 'LAST_24_HOURS',
+    LAST_3_DAYS = 'LAST_3_DAYS',
+    LAST_WEEK = 'LAST_WEEK'
+}
+
 export type ReportListDto = {
     id: number;
     title: string;
@@ -909,6 +918,7 @@ export type GetReportsData = {
     query?: {
         type?: ReportType;
         categoryId?: number;
+        postedWithin?: TimeWindow;
         search?: string;
     };
     url: '/reports';
@@ -1047,6 +1057,37 @@ export type SaveReportResponses = {
 };
 
 export type SaveReportResponse = SaveReportResponses[keyof SaveReportResponses];
+
+export type ResolveReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/resolve';
+};
+
+export type ResolveReportErrors = {
+    /**
+     * Report is not active or closed
+     */
+    400: ReportDetailsDto;
+    /**
+     * No such report, or not yours
+     */
+    404: ReportDetailsDto;
+};
+
+export type ResolveReportError = ResolveReportErrors[keyof ResolveReportErrors];
+
+export type ResolveReportResponses = {
+    /**
+     * Marked as reunited
+     */
+    200: ReportDetailsDto;
+};
+
+export type ResolveReportResponse = ResolveReportResponses[keyof ResolveReportResponses];
 
 export type ReopenReportData = {
     body?: never;
