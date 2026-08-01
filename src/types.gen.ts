@@ -10,6 +10,23 @@ export type UpdateUserProfileDto = {
     phoneNumber?: string;
 };
 
+/**
+ * A city the app has zone coverage for. Picking one scopes search, the nearby feed, address lookup and matching to that city.
+ */
+export type CityDto = {
+    id: number;
+    /**
+     * Stable short identifier, also used as the prefix of this city's zone codes ("BG" for Beograd). Safe to compare against; the name is not.
+     */
+    code: string;
+    name: string;
+    /**
+     * Point guaranteed to lie inside the city, for centring a map when the user has no location fix.
+     */
+    centerLatitude: number;
+    centerLongitude: number;
+};
+
 export type UserProfileDto = {
     id: number;
     email: string;
@@ -21,6 +38,17 @@ export type UserProfileDto = {
     googleLinked: boolean;
     createdAt: string;
     role: string;
+    activeCity: CityDto;
+};
+
+/**
+ * Which city to browse from now on.
+ */
+export type ChangeCityRequestDto = {
+    /**
+     * Id from GET /cities.
+     */
+    cityId: number;
 };
 
 export type UpdateMinQuestionsRequestDto = {
@@ -72,7 +100,7 @@ export type CreateReportRequest = {
     description?: string;
     type: ReportType;
     categoryId: number;
-    location?: LocationRequest;
+    location: LocationRequest;
     contactEmail?: string;
     contactPhone?: string;
     images?: Array<ReportImageRequestDto>;
@@ -185,7 +213,7 @@ export enum ReportStatus {
 }
 
 /**
- * Administrative zone a report belongs to, with its boundary for map display. Usually a local community (mesna zajednica) or settlement of about 1 km²; falls back to the Belgrade city municipality where no finer unit covers the point, such as parks, riverbanks and industrial land.
+ * Administrative zone a report belongs to, with its boundary for map display. Usually a local community (mesna zajednica) or settlement of about 1 km²; falls back to a coarser unit — a city municipality, or the whole city where the city has no municipalities — where no finer unit covers the point, such as parks, riverbanks and industrial land.
  */
 export type ReportZoneDto = {
     name: string;
@@ -503,8 +531,8 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
@@ -517,17 +545,17 @@ export type PageNotificationDto = {
 };
 
 export type PageableObject = {
-    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    unpaged?: boolean;
     offset?: number;
     sort?: SortObject;
 };
 
 export type SortObject = {
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
     empty?: boolean;
 };
 
@@ -535,10 +563,13 @@ export type UnreadCountDto = {
     count: number;
 };
 
+/**
+ * Address suggestion for report creation.
+ */
 export type AutoCompleteSuggestionDto = {
-    osmId?: string;
-    osmType?: string;
-    displayName?: string;
+    osmId: string;
+    osmType: string;
+    displayName: string;
     displayPlace?: string;
     displayAddress?: string;
 };
@@ -617,6 +648,10 @@ export type AdminReportListDto = {
     createdAt: string;
     ownerId: number;
     ownerName?: string;
+    /**
+     * City the report belongs to, derived from its location zone. Absent for reports created before location became mandatory — those are invisible in user-facing search, which is exactly what this column makes visible to a moderator.
+     */
+    cityName?: string;
 };
 
 export type AdminReportDetailsDto = {
@@ -661,8 +696,8 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
@@ -768,6 +803,35 @@ export type UpdateProfileResponses = {
 };
 
 export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
+
+export type ChangeCityData = {
+    body: ChangeCityRequestDto;
+    path?: never;
+    query?: never;
+    url: '/users/me/city';
+};
+
+export type ChangeCityErrors = {
+    /**
+     * City is not available yet
+     */
+    400: UserProfileDto;
+    /**
+     * No such city
+     */
+    404: UserProfileDto;
+};
+
+export type ChangeCityError = ChangeCityErrors[keyof ChangeCityErrors];
+
+export type ChangeCityResponses = {
+    /**
+     * City changed
+     */
+    200: UserProfileDto;
+};
+
+export type ChangeCityResponse = ChangeCityResponses[keyof ChangeCityResponses];
 
 export type UpdateMinQuestionsData = {
     body: UpdateMinQuestionsRequestDto;
@@ -1833,6 +1897,54 @@ export type GetClaimDetailsResponses = {
 
 export type GetClaimDetailsResponse = GetClaimDetailsResponses[keyof GetClaimDetailsResponses];
 
+export type ListCitiesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/cities';
+};
+
+export type ListCitiesResponses = {
+    /**
+     * Available cities
+     */
+    200: Array<CityDto>;
+};
+
+export type ListCitiesResponse = ListCitiesResponses[keyof ListCitiesResponses];
+
+export type DetectCityData = {
+    body?: never;
+    path?: never;
+    query: {
+        latitude: number;
+        longitude: number;
+    };
+    url: '/cities/detect';
+};
+
+export type DetectCityErrors = {
+    /**
+     * Coordinates out of range
+     */
+    400: CityDto;
+};
+
+export type DetectCityError = DetectCityErrors[keyof DetectCityErrors];
+
+export type DetectCityResponses = {
+    /**
+     * Point falls inside this city
+     */
+    200: CityDto;
+    /**
+     * Point is not covered by any city
+     */
+    204: CityDto;
+};
+
+export type DetectCityResponse = DetectCityResponses[keyof DetectCityResponses];
+
 export type GetChallengeData = {
     body?: never;
     path: {
@@ -1922,6 +2034,7 @@ export type GetReports1Data = {
     query?: {
         type?: ReportType;
         status?: ReportStatus;
+        cityId?: number;
     };
     url: '/admin/reports';
 };
