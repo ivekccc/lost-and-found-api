@@ -195,6 +195,10 @@ export type ReportDetailsDto = {
     maxClaimAttempts: number;
     reported: boolean;
     zone?: ReportZoneDto;
+    /**
+     * Whether the caller has this listing saved for later. The client needs it up front to show the right menu entry — offering "Save" on something already saved is the same defect as offering an action the server would reject.
+     */
+    saved: boolean;
 };
 
 export type ReportImageDto = {
@@ -531,32 +535,32 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
 export type PageableObject = {
+    offset?: number;
+    sort?: SortObject;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
-    offset?: number;
-    sort?: SortObject;
 };
 
 export type SortObject = {
+    empty?: boolean;
     sorted?: boolean;
     unsorted?: boolean;
-    empty?: boolean;
 };
 
 export type UnreadCountDto = {
@@ -696,16 +700,16 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
+    totalPages?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
     empty?: boolean;
 };
 
@@ -995,6 +999,53 @@ export type CreateChallengeResponses = {
 };
 
 export type CreateChallengeResponse = CreateChallengeResponses[keyof CreateChallengeResponses];
+
+export type UnsaveReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/save';
+};
+
+export type UnsaveReportResponses = {
+    /**
+     * Removed from saved
+     */
+    204: void;
+};
+
+export type UnsaveReportResponse = UnsaveReportResponses[keyof UnsaveReportResponses];
+
+export type SaveReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/save';
+};
+
+export type SaveReportErrors = {
+    /**
+     * Own listing
+     */
+    400: unknown;
+    /**
+     * No such report, or not visible to you
+     */
+    404: unknown;
+};
+
+export type SaveReportResponses = {
+    /**
+     * Saved
+     */
+    204: void;
+};
+
+export type SaveReportResponse = SaveReportResponses[keyof SaveReportResponses];
 
 export type ReopenReportData = {
     body?: never;
@@ -1682,6 +1733,22 @@ export type GetReportMatchesResponses = {
 };
 
 export type GetReportMatchesResponse = GetReportMatchesResponses[keyof GetReportMatchesResponses];
+
+export type GetSavedReportsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/reports/saved';
+};
+
+export type GetSavedReportsResponses = {
+    /**
+     * Saved reports returned
+     */
+    200: Array<ReportListDto>;
+};
+
+export type GetSavedReportsResponse = GetSavedReportsResponses[keyof GetSavedReportsResponses];
 
 export type GetNearbyReportsData = {
     body?: never;
