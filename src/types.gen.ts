@@ -493,6 +493,24 @@ export enum ReportMatchStatus {
     SUGGESTED = 'SUGGESTED'
 }
 
+/**
+ * What the caller's city has done so far. Counted over the city's whole history rather than a recent window, because the smaller cities would show a zero for any window short enough to feel current, and a zero argues that the app does not work.
+ */
+export type CommunityStatisticsDto = {
+    /**
+     * Name of the caller's active city, so the client never has to join this against the profile to write the sentence.
+     */
+    cityName: string;
+    /**
+     * Listings posted in this city. Includes the caller's own, unlike the search list which hides them, so this number is not the length of any list the user sees.
+     */
+    reportsPosted: number;
+    /**
+     * Listings whose owner marked them reunited. Counted PER LISTING, not per object: when both the person who lost a wallet and the person who found it close their own listing, the same wallet counts twice. Client copy must therefore say "reports", never "items".
+     */
+    reportsReunited: number;
+};
+
 export type NearbyReportDto = {
     id: number;
     title: string;
@@ -1775,6 +1793,26 @@ export type GetReportMatchesResponses = {
 };
 
 export type GetReportMatchesResponse = GetReportMatchesResponses[keyof GetReportMatchesResponses];
+
+export type GetCommunityStatisticsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/reports/statistics';
+};
+
+export type GetCommunityStatisticsResponses = {
+    /**
+     * Statistics for the caller's active city
+     */
+    200: CommunityStatisticsDto;
+    /**
+     * Too little activity to be worth showing
+     */
+    204: CommunityStatisticsDto;
+};
+
+export type GetCommunityStatisticsResponse = GetCommunityStatisticsResponses[keyof GetCommunityStatisticsResponses];
 
 export type GetSavedReportsData = {
     body?: never;
