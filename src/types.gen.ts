@@ -437,16 +437,16 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
-    numberOfElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -473,6 +473,20 @@ export enum TimeWindow {
     LAST_3_DAYS = 'LAST_3_DAYS',
     LAST_WEEK = 'LAST_WEEK'
 }
+
+export type PageReportListDto = {
+    totalPages?: number;
+    totalElements?: number;
+    size?: number;
+    content?: Array<ReportListDto>;
+    number?: number;
+    sort?: SortObject;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
+    empty?: boolean;
+};
 
 export type ReportListDto = {
     id: number;
@@ -607,16 +621,16 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
-    numberOfElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -757,16 +771,16 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
-    numberOfElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -969,15 +983,17 @@ export type GetReportsData = {
         postedWithin?: TimeWindow;
         search?: string;
         zoneId?: number;
+        page?: number;
+        size?: number;
     };
     url: '/reports';
 };
 
 export type GetReportsResponses = {
     /**
-     * Reports returned
+     * One page of reports, newest first
      */
-    200: Array<ReportListDto>;
+    200: PageReportListDto;
 };
 
 export type GetReportsResponse = GetReportsResponses[keyof GetReportsResponses];
