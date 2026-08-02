@@ -421,6 +421,51 @@ export enum AbuseReportStatus {
 }
 
 /**
+ * An administrative area of the caller's city, offered as a search filter. The two levels are the same shape on purpose: which level a city actually has is a property of that city, not something the client should reason about.
+ */
+export type CityZoneDto = {
+    id: number;
+    name: string;
+    /**
+     * The coarser area this one sits in. Null for the coarse level itself. Present on the fine level so that picking a neighbourhood can fill in the area it belongs to, without a second request.
+     */
+    parentId?: number;
+    /**
+     * Name of the parent area, for telling apart same-named neighbourhoods from different municipalities. Null when the parent's name repeats this one.
+     */
+    parentName?: string;
+};
+
+export type PageCityZoneDto = {
+    totalElements?: number;
+    totalPages?: number;
+    size?: number;
+    content?: Array<CityZoneDto>;
+    number?: number;
+    sort?: SortObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
+    empty?: boolean;
+};
+
+export type PageableObject = {
+    offset?: number;
+    sort?: SortObject;
+    paged?: boolean;
+    pageNumber?: number;
+    pageSize?: number;
+    unpaged?: boolean;
+};
+
+export type SortObject = {
+    empty?: boolean;
+    sorted?: boolean;
+    unsorted?: boolean;
+};
+
+/**
  * How far back the search looks, counted from the moment of the request.
  */
 export enum TimeWindow {
@@ -573,21 +618,6 @@ export type PageNotificationDto = {
     last?: boolean;
     pageable?: PageableObject;
     empty?: boolean;
-};
-
-export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
-    paged?: boolean;
-    pageNumber?: number;
-    pageSize?: number;
-    unpaged?: boolean;
-};
-
-export type SortObject = {
-    empty?: boolean;
-    sorted?: boolean;
-    unsorted?: boolean;
 };
 
 export type UnreadCountDto = {
@@ -938,6 +968,7 @@ export type GetReportsData = {
         categoryId?: number;
         postedWithin?: TimeWindow;
         search?: string;
+        zoneId?: number;
     };
     url: '/reports';
 };
@@ -1696,6 +1727,43 @@ export type MarkAllAsReadResponses = {
      */
     200: unknown;
 };
+
+export type GetNeighbourhoodsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        areaId?: number;
+        search?: string;
+        page?: number;
+        size?: number;
+    };
+    url: '/zones/neighbourhoods';
+};
+
+export type GetNeighbourhoodsResponses = {
+    /**
+     * One page of parts, ordered by name
+     */
+    200: PageCityZoneDto;
+};
+
+export type GetNeighbourhoodsResponse = GetNeighbourhoodsResponses[keyof GetNeighbourhoodsResponses];
+
+export type GetAreasData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/zones/areas';
+};
+
+export type GetAreasResponses = {
+    /**
+     * Areas of the caller's active city
+     */
+    200: Array<CityZoneDto>;
+};
+
+export type GetAreasResponse = GetAreasResponses[keyof GetAreasResponses];
 
 export type GetMyClaimsData = {
     body?: never;
