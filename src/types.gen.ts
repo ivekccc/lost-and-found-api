@@ -437,8 +437,8 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     numberOfElements?: number;
     first?: boolean;
@@ -475,8 +475,8 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     numberOfElements?: number;
     first?: boolean;
@@ -621,8 +621,8 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     numberOfElements?: number;
     first?: boolean;
@@ -771,8 +771,8 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
     pageable?: PageableObject;
     numberOfElements?: number;
     first?: boolean;
@@ -782,6 +782,61 @@ export type PageAdminMatchListDto = {
     number?: number;
     sort?: SortObject;
     empty?: boolean;
+};
+
+export type AdminMatchDetailsDto = {
+    id: number;
+    score: number;
+    /**
+     * Distance between the two exact locations, the d in the spatial component
+     */
+    distanceKm: number;
+    distanceScore: number;
+    timeGapDays: number;
+    timeScore: number;
+    /**
+     * Trigram similarity of title and description, 0 to 1
+     */
+    textSimilarity: number;
+    textScore: number;
+    config: MatchingConfigDto;
+    status: ReportMatchStatus;
+    /**
+     * Shared by both listings — matching only pairs within one category
+     */
+    categoryName: string;
+    lostReportId: number;
+    lostReportTitle: string;
+    lostReportStatus: ReportStatus;
+    foundReportId: number;
+    foundReportTitle: string;
+    foundReportStatus: ReportStatus;
+    lostDismissedAt?: string;
+    foundDismissedAt?: string;
+    notifiedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+};
+
+/**
+ * Matching parameters as applied when this match was computed
+ */
+export type MatchingConfigDto = {
+    /**
+     * Hard cut-off; candidates further apart are dropped before scoring
+     */
+    maxDistanceKm: number;
+    weightDistance: number;
+    weightText: number;
+    weightTime: number;
+    /**
+     * Days after which the time signal contributes nothing
+     */
+    timeDecayDays: number;
+    /**
+     * Minimum total score for a pair to be suggested
+     */
+    scoreThreshold: number;
 };
 
 export type AdminClaimListDto = {
@@ -2317,6 +2372,33 @@ export type GetMatchesResponses = {
 };
 
 export type GetMatchesResponse = GetMatchesResponses[keyof GetMatchesResponses];
+
+export type GetMatchData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/matches/{id}';
+};
+
+export type GetMatchErrors = {
+    /**
+     * Match not found
+     */
+    404: AdminMatchDetailsDto;
+};
+
+export type GetMatchError = GetMatchErrors[keyof GetMatchErrors];
+
+export type GetMatchResponses = {
+    /**
+     * Match found
+     */
+    200: AdminMatchDetailsDto;
+};
+
+export type GetMatchResponse = GetMatchResponses[keyof GetMatchResponses];
 
 export type GetClaimsData = {
     body?: never;
