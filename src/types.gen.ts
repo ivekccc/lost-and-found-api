@@ -437,32 +437,32 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
+    offset?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
-    empty?: boolean;
     sorted?: boolean;
     unsorted?: boolean;
+    empty?: boolean;
 };
 
 /**
@@ -475,16 +475,16 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -621,16 +621,16 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -771,16 +771,16 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
