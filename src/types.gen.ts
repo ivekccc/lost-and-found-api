@@ -327,11 +327,16 @@ export type VerifyRequestDto = {
 };
 
 export type AuthResponseDto = {
-    token: string;
+    accessToken: string;
     refreshToken: string;
-    message?: string;
-    role: string;
+    role: UserRole;
 };
+
+export enum UserRole {
+    USER = 'USER',
+    ADMIN = 'ADMIN',
+    COORDINATOR = 'COORDINATOR'
+}
 
 export type ResetPasswordRequestDto = {
     email: string;
@@ -359,7 +364,14 @@ export type RefreshTokenRequestDto = {
 export type RefreshTokenResponseDto = {
     accessToken: string;
     refreshToken: string;
-    message?: string;
+};
+
+export type LogoutRequestDto = {
+    refreshToken: string;
+    /**
+     * Push token of this device. Sent so the server stops pushing to a device that has signed out; cleared only when it matches the one on record, since another device may still be signed in to the same account.
+     */
+    fcmToken?: string;
 };
 
 export type AuthRequestDto = {
@@ -437,12 +449,12 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
+    totalPages?: number;
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
@@ -475,12 +487,12 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
+    totalPages?: number;
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
@@ -621,12 +633,12 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
+    totalPages?: number;
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -682,12 +694,6 @@ export type ClaimSummaryDto = {
     totalChoiceAnswers: number;
     hasPhoto: boolean;
 };
-
-export enum UserRole {
-    USER = 'USER',
-    ADMIN = 'ADMIN',
-    COORDINATOR = 'COORDINATOR'
-}
 
 export type UserListDto = {
     id: number;
@@ -771,12 +777,12 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
+    totalPages?: number;
     numberOfElements?: number;
     first?: boolean;
     last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
@@ -1548,6 +1554,22 @@ export type RefreshResponses = {
 };
 
 export type RefreshResponse = RefreshResponses[keyof RefreshResponses];
+
+export type LogoutData = {
+    body: LogoutRequestDto;
+    path?: never;
+    query?: never;
+    url: '/auth/logout';
+};
+
+export type LogoutResponses = {
+    /**
+     * Session ended
+     */
+    204: void;
+};
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
 
 export type LoginData = {
     body: AuthRequestDto;
