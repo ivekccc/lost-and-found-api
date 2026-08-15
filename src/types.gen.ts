@@ -83,6 +83,43 @@ export type AdminQuestionTemplateDto = {
     createdAt: string;
 };
 
+/**
+ * New scoring parameters; the three weights must add up to exactly 100
+ */
+export type UpdateMatchingConfigRequest = {
+    maxDistanceKm: number;
+    weightDistance: number;
+    weightText: number;
+    weightTime: number;
+    timeDecayDays: number;
+    scoreThreshold: number;
+};
+
+/**
+ * Live scoring parameters of the matching engine
+ */
+export type MatchingConfigDto = {
+    /**
+     * Hard cut-off; candidates further apart are dropped before scoring
+     */
+    maxDistanceKm: number;
+    weightDistance: number;
+    weightText: number;
+    weightTime: number;
+    /**
+     * Days after which the time signal contributes nothing
+     */
+    timeDecayDays: number;
+    /**
+     * Minimum total score for a pair to be suggested
+     */
+    scoreThreshold: number;
+    /**
+     * When these values were last changed
+     */
+    updatedAt: string;
+};
+
 export type ChallengeQuestionRequestDto = {
     prompt: string;
     kind: QuestionKind;
@@ -449,32 +486,32 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
-    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    unpaged?: boolean;
+    offset?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
-    empty?: boolean;
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
+    empty?: boolean;
 };
 
 /**
@@ -487,16 +524,16 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
@@ -633,16 +670,16 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
@@ -777,16 +814,16 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
@@ -805,7 +842,7 @@ export type AdminMatchDetailsDto = {
      */
     textSimilarity: number;
     textScore: number;
-    config: MatchingConfigDto;
+    config: AppliedMatchingConfigDto;
     status: ReportMatchStatus;
     /**
      * Shared by both listings — matching only pairs within one category
@@ -827,7 +864,7 @@ export type AdminMatchDetailsDto = {
 /**
  * Matching parameters as applied when this match was computed
  */
-export type MatchingConfigDto = {
+export type AppliedMatchingConfigDto = {
     /**
      * Hard cut-off; candidates further apart are dropped before scoring
      */
@@ -1034,6 +1071,47 @@ export type UpdateTemplateResponses = {
 };
 
 export type UpdateTemplateResponse = UpdateTemplateResponses[keyof UpdateTemplateResponses];
+
+export type GetMatchingConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/admin/matching-config';
+};
+
+export type GetMatchingConfigResponses = {
+    /**
+     * Current parameters
+     */
+    200: MatchingConfigDto;
+};
+
+export type GetMatchingConfigResponse = GetMatchingConfigResponses[keyof GetMatchingConfigResponses];
+
+export type UpdateMatchingConfigData = {
+    body: UpdateMatchingConfigRequest;
+    path?: never;
+    query?: never;
+    url: '/admin/matching-config';
+};
+
+export type UpdateMatchingConfigErrors = {
+    /**
+     * A value is out of range, or the three weights do not add up to 100
+     */
+    400: MatchingConfigDto;
+};
+
+export type UpdateMatchingConfigError = UpdateMatchingConfigErrors[keyof UpdateMatchingConfigErrors];
+
+export type UpdateMatchingConfigResponses = {
+    /**
+     * Parameters updated
+     */
+    200: MatchingConfigDto;
+};
+
+export type UpdateMatchingConfigResponse = UpdateMatchingConfigResponses[keyof UpdateMatchingConfigResponses];
 
 export type GetReportsData = {
     body?: never;
