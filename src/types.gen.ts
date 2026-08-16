@@ -488,30 +488,30 @@ export type CityZoneDto = {
 export type PageCityZoneDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 };
 
 export type PageableObject = {
+    offset?: number;
+    sort?: SortObject;
+    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
-    unpaged?: boolean;
-    offset?: number;
-    sort?: SortObject;
 };
 
 export type SortObject = {
-    sorted?: boolean;
-    unsorted?: boolean;
     empty?: boolean;
+    unsorted?: boolean;
+    sorted?: boolean;
 };
 
 /**
@@ -526,14 +526,14 @@ export enum TimeWindow {
 export type PageReportListDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 };
 
@@ -672,14 +672,14 @@ export type NotificationDto = {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 };
 
@@ -696,6 +696,18 @@ export type AutoCompleteSuggestionDto = {
     displayName: string;
     displayPlace?: string;
     displayAddress?: string;
+};
+
+/**
+ * Address resolved from coordinates, with the city it falls in
+ */
+export type ReverseGeocodeDto = {
+    suggestion: AutoCompleteSuggestionDto;
+    city: CityDto;
+    /**
+     * False when the address is in a different city than the one the caller is browsing; the client then has to switch city before the address can be used for a listing
+     */
+    matchesActiveCity: boolean;
 };
 
 export type CloudinarySignatureDto = {
@@ -816,14 +828,14 @@ export type AdminMatchListDto = {
 export type PageAdminMatchListDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
     empty?: boolean;
 };
 
@@ -2217,6 +2229,42 @@ export type GetMyMatchesResponses = {
 };
 
 export type GetMyMatchesResponse = GetMyMatchesResponses[keyof GetMyMatchesResponses];
+
+export type ReverseGeocodeData = {
+    body?: never;
+    path?: never;
+    query: {
+        latitude: number;
+        longitude: number;
+    };
+    url: '/locations/reverse';
+};
+
+export type ReverseGeocodeErrors = {
+    /**
+     * Coordinates out of range
+     */
+    400: ReverseGeocodeDto;
+    /**
+     * No address at these coordinates
+     */
+    404: ReverseGeocodeDto;
+    /**
+     * The place is outside every supported city
+     */
+    409: ReverseGeocodeDto;
+};
+
+export type ReverseGeocodeError = ReverseGeocodeErrors[keyof ReverseGeocodeErrors];
+
+export type ReverseGeocodeResponses = {
+    /**
+     * Address resolved
+     */
+    200: ReverseGeocodeDto;
+};
+
+export type ReverseGeocodeResponse = ReverseGeocodeResponses[keyof ReverseGeocodeResponses];
 
 export type AutocompleteData = {
     body?: never;
