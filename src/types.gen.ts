@@ -247,6 +247,7 @@ export type ReportImageDto = {
 export enum ReportStatus {
     ACTIVE = 'ACTIVE',
     MATCHED = 'MATCHED',
+    CLOSED = 'CLOSED',
     RESOLVED = 'RESOLVED',
     EXPIRED = 'EXPIRED',
     FLAGGED = 'FLAGGED',
@@ -488,30 +489,30 @@ export type CityZoneDto = {
 export type PageCityZoneDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
     unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    offset?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
-    empty?: boolean;
     unsorted?: boolean;
     sorted?: boolean;
+    empty?: boolean;
 };
 
 /**
@@ -526,14 +527,14 @@ export enum TimeWindow {
 export type PageReportListDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
@@ -672,14 +673,14 @@ export type NotificationDto = {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
@@ -828,14 +829,14 @@ export type AdminMatchListDto = {
 export type PageAdminMatchListDto = {
     totalPages?: number;
     totalElements?: number;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    numberOfElements?: number;
-    first?: boolean;
-    last?: boolean;
     empty?: boolean;
 };
 
