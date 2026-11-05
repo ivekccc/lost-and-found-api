@@ -165,11 +165,17 @@ export type CreateReportRequest = {
 };
 
 /**
- * Request body for location data
+ * Exact point the user confirmed on the map
  */
 export type LocationRequest = {
-    osmId: string;
-    osmType: string;
+    /**
+     * Latitude of the confirmed pin
+     */
+    latitude: number;
+    /**
+     * Longitude of the confirmed pin
+     */
+    longitude: number;
 };
 
 export enum QuestionSource {
@@ -719,16 +725,24 @@ export type AutoCompleteSuggestionDto = {
     displayName: string;
     displayPlace?: string;
     displayAddress?: string;
+    /**
+     * Latitude of the address, where the map picker opens
+     */
+    latitude: number;
+    /**
+     * Longitude of the address, where the map picker opens
+     */
+    longitude: number;
 };
 
 /**
  * Address resolved from coordinates, with the city it falls in
  */
 export type ReverseGeocodeDto = {
-    suggestion: AutoCompleteSuggestionDto;
+    suggestion?: AutoCompleteSuggestionDto;
     city: CityDto;
     /**
-     * False when the address is in a different city than the one the caller is browsing; the client then has to switch city before the address can be used for a listing
+     * False when the point is in a different city than the one the caller is browsing; the client then has to switch city before the point can be used for a listing
      */
     matchesActiveCity: boolean;
 };
@@ -2285,13 +2299,13 @@ export type ReverseGeocodeErrors = {
      */
     400: ReverseGeocodeDto;
     /**
-     * No address at these coordinates
-     */
-    404: ReverseGeocodeDto;
-    /**
-     * The place is outside every supported city
+     * The point is outside every supported city
      */
     409: ReverseGeocodeDto;
+    /**
+     * The address provider is busy; retry after a moment
+     */
+    429: ReverseGeocodeDto;
 };
 
 export type ReverseGeocodeError = ReverseGeocodeErrors[keyof ReverseGeocodeErrors];
