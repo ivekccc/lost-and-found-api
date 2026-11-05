@@ -11,6 +11,14 @@ export type UpdateUserProfileDto = {
 };
 
 /**
+ * Language the user chose in the app. Push notifications, inbox entries and emails are written in it, since those are sent without a request to take a language from.
+ */
+export enum AppLanguage {
+    SR_LATN = 'SR_LATN',
+    EN = 'EN'
+}
+
+/**
  * A city the app has zone coverage for. Picking one scopes search, the nearby feed, address lookup and matching to that city.
  */
 export type CityDto = {
@@ -39,6 +47,14 @@ export type UserProfileDto = {
     createdAt: string;
     role: string;
     activeCity: CityDto;
+    language: AppLanguage;
+};
+
+/**
+ * Language the user picked in the app
+ */
+export type UpdateLanguageRequestDto = {
+    language: AppLanguage;
 };
 
 /**
@@ -67,8 +83,10 @@ export enum QuestionKind {
 
 export type UpdateQuestionTemplateRequestDto = {
     prompt: string;
+    promptSr: string;
     kind: QuestionKind;
     defaultChoices?: Array<string>;
+    defaultChoicesSr?: Array<string>;
     isActive: boolean;
 };
 
@@ -77,8 +95,10 @@ export type AdminQuestionTemplateDto = {
     categoryId: number;
     categoryName: string;
     prompt: string;
+    promptSr: string;
     kind: QuestionKind;
     defaultChoices?: Array<string>;
+    defaultChoicesSr?: Array<string>;
     isActive: boolean;
     createdAt: string;
 };
@@ -428,8 +448,10 @@ export type ForgotPasswordRequestDto = {
 export type CreateQuestionTemplateRequestDto = {
     categoryId: number;
     prompt: string;
+    promptSr: string;
     kind: QuestionKind;
     defaultChoices?: Array<string>;
+    defaultChoicesSr?: Array<string>;
 };
 
 export enum AbuseReason {
@@ -489,10 +511,10 @@ export type CityZoneDto = {
 export type PageCityZoneDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
@@ -501,17 +523,17 @@ export type PageCityZoneDto = {
 };
 
 export type PageableObject = {
-    unpaged?: boolean;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
+    unpaged?: boolean;
     offset?: number;
     sort?: SortObject;
 };
 
 export type SortObject = {
-    unsorted?: boolean;
     sorted?: boolean;
+    unsorted?: boolean;
     empty?: boolean;
 };
 
@@ -527,10 +549,10 @@ export enum TimeWindow {
 export type PageReportListDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
@@ -673,10 +695,10 @@ export type NotificationDto = {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -829,10 +851,10 @@ export type AdminMatchListDto = {
 export type PageAdminMatchListDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
     numberOfElements?: number;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
@@ -989,6 +1011,22 @@ export type UpdateProfileResponses = {
 };
 
 export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
+
+export type ChangeLanguageData = {
+    body: UpdateLanguageRequestDto;
+    path?: never;
+    query?: never;
+    url: '/users/me/language';
+};
+
+export type ChangeLanguageResponses = {
+    /**
+     * Language changed
+     */
+    204: void;
+};
+
+export type ChangeLanguageResponse = ChangeLanguageResponses[keyof ChangeLanguageResponses];
 
 export type ChangeCityData = {
     body: ChangeCityRequestDto;
