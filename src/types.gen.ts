@@ -67,6 +67,163 @@ export type ChangeCityRequestDto = {
     cityId: number;
 };
 
+/**
+ * Exact point the user confirmed on the map
+ */
+export type LocationRequest = {
+    /**
+     * Latitude of the confirmed pin
+     */
+    latitude: number;
+    /**
+     * Longitude of the confirmed pin
+     */
+    longitude: number;
+};
+
+/**
+ * Newly uploaded photos, shown after the kept ones
+ */
+export type ReportImageRequestDto = {
+    imageUrl: string;
+    publicId: string;
+};
+
+/**
+ * The owner's edit of a published report. Type, category and verification questions cannot be changed.
+ */
+export type UpdateReportRequestDto = {
+    title: string;
+    description?: string;
+    location: LocationRequest;
+    contactEmail?: string;
+    contactPhone?: string;
+    /**
+     * Ids of the current photos to keep, in display order; photos left out are removed
+     */
+    keptImageIds: Array<number>;
+    /**
+     * Newly uploaded photos, shown after the kept ones
+     */
+    newImages?: Array<ReportImageRequestDto>;
+};
+
+export enum ClaimStatus {
+    PENDING = 'PENDING',
+    APPROVED = 'APPROVED',
+    DECLINED = 'DECLINED',
+    WITHDRAWN = 'WITHDRAWN'
+}
+
+/**
+ * Location data
+ */
+export type LocationDto = {
+    /**
+     * Exact latitude. Null for everyone except the report owner (and after their ownership claim is approved) — see the zonal location view.
+     */
+    latitude?: number;
+    /**
+     * Exact longitude. Null for everyone except the report owner (and after their ownership claim is approved) — see the zonal location view.
+     */
+    longitude?: number;
+    /**
+     * Full street address for the owner; just the zone name (e.g. "Mirijevo, Zvezdara") for everyone else.
+     */
+    formattedAddress?: string;
+};
+
+export type ReportDetailsDto = {
+    id: number;
+    title: string;
+    description?: string;
+    type: ReportType;
+    categoryId: number;
+    categoryName: string;
+    categoryImageUrl?: string;
+    status: ReportStatus;
+    location?: LocationDto;
+    createdAt: string;
+    expiresAt?: string;
+    userId: number;
+    userFullName?: string;
+    hasContactEmail: boolean;
+    hasContactPhone: boolean;
+    /**
+     * The contact email itself, only for the owner so the report can be edited; null for everyone else
+     */
+    contactEmail?: string;
+    /**
+     * The contact phone itself, only for the owner so the report can be edited; null for everyone else
+     */
+    contactPhone?: string;
+    images?: Array<ReportImageDto>;
+    /**
+     * Id of the challenge the report OWNER created on their own found report. Only ever set for FOUND reports; this is the challenge a claimant answers.
+     */
+    challengeId?: number;
+    /**
+     * Id of the challenge the VIEWER created on this report as a finder. Only ever set for LOST reports. Present means the viewer already sent verification questions, so they must not be offered the action again — and they are the one allowed to review the claims on it.
+     */
+    myChallengeId?: number;
+    /**
+     * Id of the viewer's most recent ownership claim on this report's challenge. Absent when the viewer has never claimed.
+     */
+    myClaimId?: number;
+    myClaimStatus?: ClaimStatus;
+    /**
+     * How many claims the viewer has already submitted on this report's challenge.
+     */
+    myClaimAttemptsUsed: number;
+    /**
+     * Server-side cap on claim attempts per challenge. Sent so clients do not duplicate the rule and drift from it.
+     */
+    maxClaimAttempts: number;
+    reported: boolean;
+    zone?: ReportZoneDto;
+    /**
+     * Whether the caller has this listing saved for later. The client needs it up front to show the right menu entry — offering "Save" on something already saved is the same defect as offering an action the server would reject.
+     */
+    saved: boolean;
+};
+
+export type ReportImageDto = {
+    id: number;
+    imageUrl: string;
+    displayOrder: number;
+};
+
+export enum ReportStatus {
+    ACTIVE = 'ACTIVE',
+    MATCHED = 'MATCHED',
+    CLOSED = 'CLOSED',
+    RESOLVED = 'RESOLVED',
+    EXPIRED = 'EXPIRED',
+    FLAGGED = 'FLAGGED',
+    DELETED = 'DELETED'
+}
+
+export enum ReportType {
+    LOST = 'LOST',
+    FOUND = 'FOUND'
+}
+
+/**
+ * Administrative zone a report belongs to, with its boundary for map display. Usually a local community (mesna zajednica) or settlement of about 1 km²; falls back to a coarser unit — a city municipality, or the whole city where the city has no municipalities — where no finer unit covers the point, such as parks, riverbanks and industrial land.
+ */
+export type ReportZoneDto = {
+    name: string;
+    city: string;
+    /**
+     * Name of the containing city municipality, e.g. "Zvezdara" for the "Mirijevo" zone. Absent when the zone IS a municipality, which happens where no finer unit covers the location.
+     */
+    parentName?: string;
+    /**
+     * Zone boundary as a GeoJSON MultiPolygon geometry object. Always a MultiPolygon, never a bare Polygon, so clients need a single parsing path. Zones larger than 2 km² are simplified for display; smaller ones are sent as stored, because display-level simplification would visibly deform a polygon that small. The threshold is on area rather than administrative level, since a rural settlement can be far larger than a city municipality.
+     */
+    boundaryGeoJson: string;
+};
+
 export type UpdateMinQuestionsRequestDto = {
     minQuestions: number;
 };
@@ -164,137 +321,10 @@ export type CreateReportRequest = {
     questions?: Array<ChallengeQuestionRequestDto>;
 };
 
-/**
- * Exact point the user confirmed on the map
- */
-export type LocationRequest = {
-    /**
-     * Latitude of the confirmed pin
-     */
-    latitude: number;
-    /**
-     * Longitude of the confirmed pin
-     */
-    longitude: number;
-};
-
 export enum QuestionSource {
     TEMPLATE = 'TEMPLATE',
     CUSTOM = 'CUSTOM'
 }
-
-export type ReportImageRequestDto = {
-    imageUrl: string;
-    publicId: string;
-};
-
-export enum ReportType {
-    LOST = 'LOST',
-    FOUND = 'FOUND'
-}
-
-export enum ClaimStatus {
-    PENDING = 'PENDING',
-    APPROVED = 'APPROVED',
-    DECLINED = 'DECLINED',
-    WITHDRAWN = 'WITHDRAWN'
-}
-
-/**
- * Location data
- */
-export type LocationDto = {
-    /**
-     * Exact latitude. Null for everyone except the report owner (and after their ownership claim is approved) — see the zonal location view.
-     */
-    latitude?: number;
-    /**
-     * Exact longitude. Null for everyone except the report owner (and after their ownership claim is approved) — see the zonal location view.
-     */
-    longitude?: number;
-    /**
-     * Full street address for the owner; just the zone name (e.g. "Mirijevo, Zvezdara") for everyone else.
-     */
-    formattedAddress?: string;
-};
-
-export type ReportDetailsDto = {
-    id: number;
-    title: string;
-    description?: string;
-    type: ReportType;
-    categoryId: number;
-    categoryName: string;
-    categoryImageUrl?: string;
-    status: ReportStatus;
-    location?: LocationDto;
-    createdAt: string;
-    expiresAt?: string;
-    userId: number;
-    userFullName?: string;
-    hasContactEmail: boolean;
-    hasContactPhone: boolean;
-    images?: Array<ReportImageDto>;
-    /**
-     * Id of the challenge the report OWNER created on their own found report. Only ever set for FOUND reports; this is the challenge a claimant answers.
-     */
-    challengeId?: number;
-    /**
-     * Id of the challenge the VIEWER created on this report as a finder. Only ever set for LOST reports. Present means the viewer already sent verification questions, so they must not be offered the action again — and they are the one allowed to review the claims on it.
-     */
-    myChallengeId?: number;
-    /**
-     * Id of the viewer's most recent ownership claim on this report's challenge. Absent when the viewer has never claimed.
-     */
-    myClaimId?: number;
-    myClaimStatus?: ClaimStatus;
-    /**
-     * How many claims the viewer has already submitted on this report's challenge.
-     */
-    myClaimAttemptsUsed: number;
-    /**
-     * Server-side cap on claim attempts per challenge. Sent so clients do not duplicate the rule and drift from it.
-     */
-    maxClaimAttempts: number;
-    reported: boolean;
-    zone?: ReportZoneDto;
-    /**
-     * Whether the caller has this listing saved for later. The client needs it up front to show the right menu entry — offering "Save" on something already saved is the same defect as offering an action the server would reject.
-     */
-    saved: boolean;
-};
-
-export type ReportImageDto = {
-    id: number;
-    imageUrl: string;
-    displayOrder: number;
-};
-
-export enum ReportStatus {
-    ACTIVE = 'ACTIVE',
-    MATCHED = 'MATCHED',
-    CLOSED = 'CLOSED',
-    RESOLVED = 'RESOLVED',
-    EXPIRED = 'EXPIRED',
-    FLAGGED = 'FLAGGED',
-    DELETED = 'DELETED'
-}
-
-/**
- * Administrative zone a report belongs to, with its boundary for map display. Usually a local community (mesna zajednica) or settlement of about 1 km²; falls back to a coarser unit — a city municipality, or the whole city where the city has no municipalities — where no finer unit covers the point, such as parks, riverbanks and industrial land.
- */
-export type ReportZoneDto = {
-    name: string;
-    city: string;
-    /**
-     * Name of the containing city municipality, e.g. "Zvezdara" for the "Mirijevo" zone. Absent when the zone IS a municipality, which happens where no finer unit covers the location.
-     */
-    parentName?: string;
-    /**
-     * Zone boundary as a GeoJSON MultiPolygon geometry object. Always a MultiPolygon, never a bare Polygon, so clients need a single parsing path. Zones larger than 2 km² are simplified for display; smaller ones are sent as stored, because display-level simplification would visibly deform a polygon that small. The threshold is on area rather than administrative level, since a rural settlement can be far larger than a city municipality.
-     */
-    boundaryGeoJson: string;
-};
 
 export type CreateChallengeRequestDto = {
     questions: Array<ChallengeQuestionRequestDto>;
@@ -1070,6 +1100,84 @@ export type ChangeCityResponses = {
 };
 
 export type ChangeCityResponse = ChangeCityResponses[keyof ChangeCityResponses];
+
+export type DeleteReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}';
+};
+
+export type DeleteReportErrors = {
+    /**
+     * Report is already deleted
+     */
+    400: unknown;
+    /**
+     * Report not found or not owned by the caller
+     */
+    404: unknown;
+};
+
+export type DeleteReportResponses = {
+    /**
+     * Report deleted
+     */
+    204: void;
+};
+
+export type DeleteReportResponse = DeleteReportResponses[keyof DeleteReportResponses];
+
+export type GetReportByIdData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}';
+};
+
+export type GetReportByIdResponses = {
+    /**
+     * OK
+     */
+    200: ReportDetailsDto;
+};
+
+export type GetReportByIdResponse = GetReportByIdResponses[keyof GetReportByIdResponses];
+
+export type UpdateReportData = {
+    body: UpdateReportRequestDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}';
+};
+
+export type UpdateReportErrors = {
+    /**
+     * Invalid data, report not editable in its status, too many photos, a photo that is not part of the report, or a location outside the caller's city
+     */
+    400: ReportDetailsDto;
+    /**
+     * Report not found or not owned by the caller
+     */
+    404: ReportDetailsDto;
+};
+
+export type UpdateReportError = UpdateReportErrors[keyof UpdateReportErrors];
+
+export type UpdateReportResponses = {
+    /**
+     * Report updated
+     */
+    200: ReportDetailsDto;
+};
+
+export type UpdateReportResponse = UpdateReportResponses[keyof UpdateReportResponses];
 
 export type UpdateMinQuestionsData = {
     body: UpdateMinQuestionsRequestDto;
@@ -2032,53 +2140,6 @@ export type SecretResponses = {
 };
 
 export type SecretResponse = SecretResponses[keyof SecretResponses];
-
-export type DeleteReportData = {
-    body?: never;
-    path: {
-        id: number;
-    };
-    query?: never;
-    url: '/reports/{id}';
-};
-
-export type DeleteReportErrors = {
-    /**
-     * Report is already deleted
-     */
-    400: unknown;
-    /**
-     * Report not found or not owned by the caller
-     */
-    404: unknown;
-};
-
-export type DeleteReportResponses = {
-    /**
-     * Report deleted
-     */
-    204: void;
-};
-
-export type DeleteReportResponse = DeleteReportResponses[keyof DeleteReportResponses];
-
-export type GetReportByIdData = {
-    body?: never;
-    path: {
-        id: number;
-    };
-    query?: never;
-    url: '/reports/{id}';
-};
-
-export type GetReportByIdResponses = {
-    /**
-     * OK
-     */
-    200: ReportDetailsDto;
-};
-
-export type GetReportByIdResponse = GetReportByIdResponses[keyof GetReportByIdResponses];
 
 export type GetReportMatchesData = {
     body?: never;
