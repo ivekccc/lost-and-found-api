@@ -70,6 +70,10 @@ export type NotificationSettingsDto = {
      * Own report expired or reunited.
      */
     reportUpdates: boolean;
+    /**
+     * New chat messages while the app is not open.
+     */
+    messages: boolean;
 };
 
 /**
@@ -420,6 +424,57 @@ export type FcmTokenRequestDto = {
     fcmToken: string;
 };
 
+export enum MessageType {
+    TEXT = 'TEXT',
+    MEETING_POINT = 'MEETING_POINT',
+    CONTACT = 'CONTACT'
+}
+
+/**
+ * A TEXT message needs a body; a MEETING_POINT message needs latitude and longitude inside the report's city. CONTACT is sent through the dedicated endpoint.
+ */
+export type SendMessageRequestDto = {
+    type: MessageType;
+    body?: string;
+    latitude?: number;
+    longitude?: number;
+    clientId?: string;
+};
+
+/**
+ * One message in a conversation. Which optional fields are set depends on the type.
+ */
+export type MessageDto = {
+    id: number;
+    conversationId: number;
+    senderId: number;
+    type: MessageType;
+    /**
+     * Text of a TEXT message.
+     */
+    body?: string;
+    /**
+     * Point of a MEETING_POINT message.
+     */
+    latitude?: number;
+    longitude?: number;
+    /**
+     * Readable description of the meeting point.
+     */
+    placeLabel?: string;
+    /**
+     * Contact details shared in a CONTACT message, as they were when shared.
+     */
+    contactName?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    /**
+     * Echo of the client id sent with the message, for matching an optimistic copy.
+     */
+    clientId?: string;
+    createdAt: string;
+};
+
 export type ClaimDetailsDto = {
     id: number;
     challengeId: number;
@@ -432,7 +487,10 @@ export type ClaimDetailsDto = {
     submittedAt: string;
     decidedAt?: string;
     answers: Array<ClaimReviewAnswerDto>;
-    claimantContact?: RevealedContactDto;
+    /**
+     * Conversation with the claimant, once the claim is approved.
+     */
+    conversationId?: number;
 };
 
 export type ClaimReviewAnswerDto = {
@@ -442,12 +500,6 @@ export type ClaimReviewAnswerDto = {
     answerText: string;
     isCorrect?: boolean;
     expectedAnswer?: string;
-};
-
-export type RevealedContactDto = {
-    name?: string;
-    email: string;
-    phone?: string;
 };
 
 export type ClaimAnswerRequestDto = {
@@ -479,7 +531,10 @@ export type ClaimDto = {
     submittedAt: string;
     decidedAt?: string;
     answers: Array<ClaimAnswerDto>;
-    holderContact?: RevealedContactDto;
+    /**
+     * Conversation with the finder, once the claim is approved.
+     */
+    conversationId?: number;
 };
 
 export type VerifyRequestDto = {
@@ -568,7 +623,8 @@ export enum AbuseReason {
 
 export enum AbuseTargetType {
     USER = 'USER',
-    REPORT = 'REPORT'
+    REPORT = 'REPORT',
+    MESSAGE = 'MESSAGE'
 }
 
 export type CreateAbuseReportRequestDto = {
@@ -614,30 +670,30 @@ export type CityZoneDto = {
 export type PageCityZoneDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
 export type PageableObject = {
+    offset?: number;
+    sort?: SortObject;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
-    offset?: number;
-    sort?: SortObject;
 };
 
 export type SortObject = {
+    empty?: boolean;
     sorted?: boolean;
     unsorted?: boolean;
-    empty?: boolean;
 };
 
 /**
@@ -652,14 +708,14 @@ export enum TimeWindow {
 export type PageReportListDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -783,6 +839,7 @@ export enum NotificationType {
     CLAIM_SUBMITTED = 'CLAIM_SUBMITTED',
     CLAIM_APPROVED = 'CLAIM_APPROVED',
     CLAIM_DECLINED = 'CLAIM_DECLINED',
+    CHAT_MESSAGE = 'CHAT_MESSAGE',
     ACCOUNT_BLOCKED = 'ACCOUNT_BLOCKED',
     ACCOUNT_PARTIALLY_BLOCKED = 'ACCOUNT_PARTIALLY_BLOCKED'
 }
@@ -800,14 +857,14 @@ export type NotificationDto = {
 export type PageNotificationDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -844,6 +901,67 @@ export type ReverseGeocodeDto = {
      * False when the point is in a different city than the one the caller is browsing; the client then has to switch city before the point can be used for a listing
      */
     matchesActiveCity: boolean;
+};
+
+/**
+ * Conversation as listed for one participant.
+ */
+export type ConversationDto = {
+    id: number;
+    otherUserId: number;
+    otherUserName: string;
+    otherUserAvatarUrl?: string;
+    reportId: number;
+    reportTitle: string;
+    reportType: ReportType;
+    lastMessageType?: MessageType;
+    /**
+     * Body of the last message when it is text.
+     */
+    lastMessageBody?: string;
+    lastMessageMine?: boolean;
+    lastMessageAt?: string;
+    unreadCount: number;
+    createdAt: string;
+};
+
+/**
+ * Conversation header for one participant.
+ */
+export type ConversationDetailsDto = {
+    id: number;
+    otherUserId: number;
+    otherUserName: string;
+    otherUserAvatarUrl?: string;
+    reportId: number;
+    reportTitle: string;
+    reportType: ReportType;
+    myRole: ConversationRole;
+    /**
+     * Until when the other participant has read the conversation.
+     */
+    otherReadAt?: string;
+    createdAt: string;
+};
+
+export enum ConversationRole {
+    HOLDER = 'HOLDER',
+    CLAIMANT = 'CLAIMANT'
+}
+
+/**
+ * Messages newest first, with whether older ones exist.
+ */
+export type MessagePageDto = {
+    messages: Array<MessageDto>;
+    hasMore: boolean;
+};
+
+/**
+ * Conversations with at least one unread message.
+ */
+export type ConversationUnreadCountDto = {
+    count: number;
 };
 
 export type CloudinarySignatureDto = {
@@ -964,14 +1082,14 @@ export type AdminMatchListDto = {
 export type PageAdminMatchListDto = {
     totalPages?: number;
     totalElements?: number;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
+    pageable?: PageableObject;
+    first?: boolean;
+    last?: boolean;
+    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -1030,6 +1148,20 @@ export type AppliedMatchingConfigDto = {
     scoreThreshold: number;
 };
 
+/**
+ * Whole conversation for moderation, oldest message first.
+ */
+export type AdminConversationDto = {
+    id: number;
+    reportId: number;
+    reportTitle: string;
+    holderId: number;
+    holderName: string;
+    claimantId: number;
+    claimantName: string;
+    messages: Array<MessageDto>;
+};
+
 export type AdminClaimListDto = {
     id: number;
     reportId: number;
@@ -1049,6 +1181,14 @@ export type AbuseReportDto = {
     targetType: AbuseTargetType;
     targetUserId?: number;
     targetReportId?: number;
+    /**
+     * Reported chat message, when the target is a message.
+     */
+    targetMessageId?: number;
+    /**
+     * Conversation of the reported message, for reading it in context.
+     */
+    targetConversationId?: number;
     targetLabel: string;
     reason: AbuseReason;
     message?: string;
@@ -1069,6 +1209,23 @@ export type DeleteAccountRequestDto = {
      */
     googleIdToken?: string;
 };
+
+/**
+ * Frame pushed over the /ws STOMP connection to /user/queue/chat. MESSAGE carries the message, TYPING the user who is typing, READ the user and the moment they read up to.
+ */
+export type ChatEventDto = {
+    type: ChatEventType;
+    conversationId: number;
+    message?: MessageDto;
+    userId?: number;
+    readAt?: string;
+};
+
+export enum ChatEventType {
+    MESSAGE = 'MESSAGE',
+    TYPING = 'TYPING',
+    READ = 'READ'
+}
 
 export type DeleteAccountData = {
     body: DeleteAccountRequestDto;
@@ -1749,6 +1906,127 @@ export type DismissMatchResponses = {
 };
 
 export type DismissMatchResponse = DismissMatchResponses[keyof DismissMatchResponses];
+
+export type MarkReadData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/conversations/{id}/read';
+};
+
+export type MarkReadErrors = {
+    /**
+     * No such conversation of the caller
+     */
+    404: unknown;
+};
+
+export type MarkReadResponses = {
+    /**
+     * Marked read
+     */
+    204: void;
+};
+
+export type MarkReadResponse = MarkReadResponses[keyof MarkReadResponses];
+
+export type GetMessagesData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: {
+        beforeId?: number;
+        size?: number;
+    };
+    url: '/conversations/{id}/messages';
+};
+
+export type GetMessagesErrors = {
+    /**
+     * No such conversation of the caller
+     */
+    404: MessagePageDto;
+};
+
+export type GetMessagesError = GetMessagesErrors[keyof GetMessagesErrors];
+
+export type GetMessagesResponses = {
+    /**
+     * Messages returned
+     */
+    200: MessagePageDto;
+};
+
+export type GetMessagesResponse = GetMessagesResponses[keyof GetMessagesResponses];
+
+export type SendMessageData = {
+    body: SendMessageRequestDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/conversations/{id}/messages';
+};
+
+export type SendMessageErrors = {
+    /**
+     * Empty text, or meeting point outside the report's city
+     */
+    400: MessageDto;
+    /**
+     * No such conversation of the caller
+     */
+    404: MessageDto;
+    /**
+     * Too many messages
+     */
+    429: MessageDto;
+};
+
+export type SendMessageError = SendMessageErrors[keyof SendMessageErrors];
+
+export type SendMessageResponses = {
+    /**
+     * Message sent
+     */
+    201: MessageDto;
+};
+
+export type SendMessageResponse = SendMessageResponses[keyof SendMessageResponses];
+
+export type ShareContactData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/conversations/{id}/contact';
+};
+
+export type ShareContactErrors = {
+    /**
+     * No such conversation of the caller
+     */
+    404: MessageDto;
+    /**
+     * Too many messages
+     */
+    429: MessageDto;
+};
+
+export type ShareContactError = ShareContactErrors[keyof ShareContactErrors];
+
+export type ShareContactResponses = {
+    /**
+     * Contact shared
+     */
+    201: MessageDto;
+};
+
+export type ShareContactResponse = ShareContactResponses[keyof ShareContactResponses];
 
 export type WithdrawClaimData = {
     body?: never;
@@ -2588,6 +2866,65 @@ export type AutocompleteResponses = {
 
 export type AutocompleteResponse = AutocompleteResponses[keyof AutocompleteResponses];
 
+export type GetConversationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/conversations';
+};
+
+export type GetConversationsResponses = {
+    /**
+     * Conversations returned
+     */
+    200: Array<ConversationDto>;
+};
+
+export type GetConversationsResponse = GetConversationsResponses[keyof GetConversationsResponses];
+
+export type GetConversationData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/conversations/{id}';
+};
+
+export type GetConversationErrors = {
+    /**
+     * No such conversation of the caller
+     */
+    404: ConversationDetailsDto;
+};
+
+export type GetConversationError = GetConversationErrors[keyof GetConversationErrors];
+
+export type GetConversationResponses = {
+    /**
+     * Conversation returned
+     */
+    200: ConversationDetailsDto;
+};
+
+export type GetConversationResponse = GetConversationResponses[keyof GetConversationResponses];
+
+export type GetUnreadCount1Data = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/conversations/unread-count';
+};
+
+export type GetUnreadCount1Responses = {
+    /**
+     * Count returned
+     */
+    200: ConversationUnreadCountDto;
+};
+
+export type GetUnreadCount1Response = GetUnreadCount1Responses[keyof GetUnreadCount1Responses];
+
 export type GetSignatureData = {
     body?: never;
     path?: never;
@@ -2851,6 +3188,33 @@ export type GetMatchResponses = {
 };
 
 export type GetMatchResponse = GetMatchResponses[keyof GetMatchResponses];
+
+export type GetConversation1Data = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/conversations/{id}';
+};
+
+export type GetConversation1Errors = {
+    /**
+     * No such conversation
+     */
+    404: AdminConversationDto;
+};
+
+export type GetConversation1Error = GetConversation1Errors[keyof GetConversation1Errors];
+
+export type GetConversation1Responses = {
+    /**
+     * Conversation returned
+     */
+    200: AdminConversationDto;
+};
+
+export type GetConversation1Response = GetConversation1Responses[keyof GetConversation1Responses];
 
 export type GetClaimsData = {
     body?: never;
