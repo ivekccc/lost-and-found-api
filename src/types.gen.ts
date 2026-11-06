@@ -211,6 +211,10 @@ export type ReportDetailsDto = {
      * Public link to this report's share page, safe to send to anyone
      */
     shareUrl: string;
+    /**
+     * True for the owner of an active report that expires within the reminder window, when POST /reports/{id}/extend is offered.
+     */
+    canExtend: boolean;
 };
 
 export type ReportImageDto = {
@@ -772,6 +776,7 @@ export type QuestionTemplateDto = {
 export enum NotificationType {
     MATCH_FOUND = 'MATCH_FOUND',
     SAVED_SEARCH_MATCH = 'SAVED_SEARCH_MATCH',
+    REPORT_EXPIRING = 'REPORT_EXPIRING',
     REPORT_EXPIRED = 'REPORT_EXPIRED',
     REPORT_RESOLVED = 'REPORT_RESOLVED',
     CHALLENGE_CREATED = 'CHALLENGE_CREATED',
@@ -1650,6 +1655,37 @@ export type ReopenReportResponses = {
 };
 
 export type ReopenReportResponse = ReopenReportResponses[keyof ReopenReportResponses];
+
+export type ExtendReportData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/reports/{id}/extend';
+};
+
+export type ExtendReportErrors = {
+    /**
+     * Report is not active
+     */
+    400: ReportDetailsDto;
+    /**
+     * Report not found or not owned by the caller
+     */
+    404: ReportDetailsDto;
+};
+
+export type ExtendReportError = ExtendReportErrors[keyof ExtendReportErrors];
+
+export type ExtendReportResponses = {
+    /**
+     * Report extended
+     */
+    200: ReportDetailsDto;
+};
+
+export type ExtendReportResponse = ExtendReportResponses[keyof ExtendReportResponses];
 
 export type CloseReportData = {
     body?: never;
