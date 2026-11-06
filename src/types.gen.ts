@@ -185,6 +185,10 @@ export type ReportDetailsDto = {
      * Whether the caller has this listing saved for later. The client needs it up front to show the right menu entry — offering "Save" on something already saved is the same defect as offering an action the server would reject.
      */
     saved: boolean;
+    /**
+     * Public link to this report's share page, safe to send to anyone
+     */
+    shareUrl: string;
 };
 
 export type ReportImageDto = {
@@ -545,11 +549,11 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<CityZoneDto>;
@@ -583,11 +587,11 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<ReportListDto>;
@@ -729,11 +733,11 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
@@ -893,11 +897,11 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
     first?: boolean;
     last?: boolean;
-    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<AdminMatchListDto>;
