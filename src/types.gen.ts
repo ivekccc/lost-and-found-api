@@ -51,6 +51,28 @@ export type UserProfileDto = {
 };
 
 /**
+ * Which kinds of notification arrive as a push. A disabled kind still lands in the inbox; account notices always push.
+ */
+export type NotificationSettingsDto = {
+    /**
+     * Possible matches for the user's own reports.
+     */
+    matches: boolean;
+    /**
+     * New reports matching a saved search.
+     */
+    savedSearches: boolean;
+    /**
+     * Verification questions and ownership claims.
+     */
+    verification: boolean;
+    /**
+     * Own report expired or reunited.
+     */
+    reportUpdates: boolean;
+};
+
+/**
  * Language the user picked in the app
  */
 export type UpdateLanguageRequestDto = {
@@ -301,6 +323,43 @@ export type MatchingConfigDto = {
     updatedAt: string;
 };
 
+/**
+ * Search filters to be notified about. At least one must be set; the city is always the caller's active city.
+ */
+export type CreateSavedSearchRequestDto = {
+    type?: ReportType;
+    categoryId?: number;
+    /**
+     * Zone in the active city; a municipality also covers its local communities.
+     */
+    zoneId?: number;
+    search?: string;
+};
+
+/**
+ * Search the user is notified about when a matching report is posted. Absent filters match everything.
+ */
+export type SavedSearchDto = {
+    id: number;
+    cityId: number;
+    cityName: string;
+    type?: ReportType;
+    categoryId?: number;
+    /**
+     * Category name in the caller's language.
+     */
+    categoryName?: string;
+    zoneId?: number;
+    zoneName?: string;
+    /**
+     * Municipality the saved zone belongs to; absent when the zone is a municipality.
+     */
+    zoneParentId?: number;
+    zoneParentName?: string;
+    search?: string;
+    createdAt: string;
+};
+
 export type ChallengeQuestionRequestDto = {
     prompt: string;
     kind: QuestionKind;
@@ -549,12 +608,12 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
@@ -587,12 +646,12 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
@@ -712,6 +771,7 @@ export type QuestionTemplateDto = {
 
 export enum NotificationType {
     MATCH_FOUND = 'MATCH_FOUND',
+    SAVED_SEARCH_MATCH = 'SAVED_SEARCH_MATCH',
     REPORT_EXPIRED = 'REPORT_EXPIRED',
     REPORT_RESOLVED = 'REPORT_RESOLVED',
     CHALLENGE_CREATED = 'CHALLENGE_CREATED',
@@ -733,12 +793,12 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
@@ -897,12 +957,12 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
+    pageable?: PageableObject;
     first?: boolean;
     last?: boolean;
-    pageable?: PageableObject;
+    numberOfElements?: number;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
@@ -1059,6 +1119,47 @@ export type UpdateProfileResponses = {
 };
 
 export type UpdateProfileResponse = UpdateProfileResponses[keyof UpdateProfileResponses];
+
+export type GetNotificationSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/users/me/notification-settings';
+};
+
+export type GetNotificationSettingsResponses = {
+    /**
+     * Settings returned
+     */
+    200: NotificationSettingsDto;
+};
+
+export type GetNotificationSettingsResponse = GetNotificationSettingsResponses[keyof GetNotificationSettingsResponses];
+
+export type UpdateNotificationSettingsData = {
+    body: NotificationSettingsDto;
+    path?: never;
+    query?: never;
+    url: '/users/me/notification-settings';
+};
+
+export type UpdateNotificationSettingsErrors = {
+    /**
+     * A switch is missing
+     */
+    400: NotificationSettingsDto;
+};
+
+export type UpdateNotificationSettingsError = UpdateNotificationSettingsErrors[keyof UpdateNotificationSettingsErrors];
+
+export type UpdateNotificationSettingsResponses = {
+    /**
+     * Settings updated
+     */
+    200: NotificationSettingsDto;
+};
+
+export type UpdateNotificationSettingsResponse = UpdateNotificationSettingsResponses[keyof UpdateNotificationSettingsResponses];
 
 export type ChangeLanguageData = {
     body: UpdateLanguageRequestDto;
@@ -1289,6 +1390,55 @@ export type UpdateMatchingConfigResponses = {
 };
 
 export type UpdateMatchingConfigResponse = UpdateMatchingConfigResponses[keyof UpdateMatchingConfigResponses];
+
+export type GetSavedSearchesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/saved-searches';
+};
+
+export type GetSavedSearchesResponses = {
+    /**
+     * Saved searches returned
+     */
+    200: Array<SavedSearchDto>;
+};
+
+export type GetSavedSearchesResponse = GetSavedSearchesResponses[keyof GetSavedSearchesResponses];
+
+export type CreateSavedSearchData = {
+    body: CreateSavedSearchRequestDto;
+    path?: never;
+    query?: never;
+    url: '/saved-searches';
+};
+
+export type CreateSavedSearchErrors = {
+    /**
+     * No filter set, limit reached, or zone outside the active city
+     */
+    400: SavedSearchDto;
+    /**
+     * No such category
+     */
+    404: SavedSearchDto;
+    /**
+     * The same search is already saved
+     */
+    409: SavedSearchDto;
+};
+
+export type CreateSavedSearchError = CreateSavedSearchErrors[keyof CreateSavedSearchErrors];
+
+export type CreateSavedSearchResponses = {
+    /**
+     * Search saved
+     */
+    201: SavedSearchDto;
+};
+
+export type CreateSavedSearchResponse = CreateSavedSearchResponses[keyof CreateSavedSearchResponses];
 
 export type GetReportsData = {
     body?: never;
@@ -2701,3 +2851,28 @@ export type GetReports2Responses = {
 };
 
 export type GetReports2Response = GetReports2Responses[keyof GetReports2Responses];
+
+export type DeleteSavedSearchData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/saved-searches/{id}';
+};
+
+export type DeleteSavedSearchErrors = {
+    /**
+     * No such saved search of the caller
+     */
+    404: unknown;
+};
+
+export type DeleteSavedSearchResponses = {
+    /**
+     * Deleted
+     */
+    204: void;
+};
+
+export type DeleteSavedSearchResponse = DeleteSavedSearchResponses[keyof DeleteSavedSearchResponses];
