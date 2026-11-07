@@ -48,6 +48,10 @@ export type UserProfileDto = {
     role: string;
     activeCity: CityDto;
     language: AppLanguage;
+    /**
+     * How many thank-yous the user has received as a finder.
+     */
+    thanksReceived: number;
 };
 
 /**
@@ -124,6 +128,10 @@ export type UpdateReportRequestDto = {
     location: LocationRequest;
     contactEmail?: string;
     contactPhone?: string;
+    /**
+     * Reward in dinars the owner offers to the finder. Only for LOST reports; null means no reward.
+     */
+    rewardAmount?: number;
     /**
      * Ids of the current photos to keep, in display order; photos left out are removed
      */
@@ -219,6 +227,14 @@ export type ReportDetailsDto = {
      * True for the owner of an active report that expires within the reminder window, when POST /reports/{id}/extend is offered.
      */
     canExtend: boolean;
+    /**
+     * Reward in dinars the owner offers to the finder; only ever set on LOST reports.
+     */
+    rewardAmount?: number;
+    /**
+     * How many thank-yous the author of the report has received as a finder.
+     */
+    authorThanksCount: number;
 };
 
 export type ReportImageDto = {
@@ -388,6 +404,10 @@ export type CreateReportRequest = {
     location: LocationRequest;
     contactEmail?: string;
     contactPhone?: string;
+    /**
+     * Reward in dinars the owner offers to the finder. Only for LOST reports; null means no reward.
+     */
+    rewardAmount?: number;
     images?: Array<ReportImageRequestDto>;
     questions?: Array<ChallengeQuestionRequestDto>;
 };
@@ -424,21 +444,11 @@ export type FcmTokenRequestDto = {
     fcmToken: string;
 };
 
-export enum MessageType {
-    TEXT = 'TEXT',
-    MEETING_POINT = 'MEETING_POINT',
-    CONTACT = 'CONTACT'
-}
-
 /**
- * A TEXT message needs a body; a MEETING_POINT message needs latitude and longitude inside the report's city. CONTACT is sent through the dedicated endpoint.
+ * A thank-you from the owner of the item to the finder, with an optional personal note.
  */
-export type SendMessageRequestDto = {
-    type: MessageType;
-    body?: string;
-    latitude?: number;
-    longitude?: number;
-    clientId?: string;
+export type SendThanksRequestDto = {
+    note?: string;
 };
 
 /**
@@ -473,6 +483,24 @@ export type MessageDto = {
      */
     clientId?: string;
     createdAt: string;
+};
+
+export enum MessageType {
+    TEXT = 'TEXT',
+    MEETING_POINT = 'MEETING_POINT',
+    CONTACT = 'CONTACT',
+    THANKS = 'THANKS'
+}
+
+/**
+ * A TEXT message needs a body; a MEETING_POINT message needs latitude and longitude inside the report's city. CONTACT is sent through the dedicated endpoint.
+ */
+export type SendMessageRequestDto = {
+    type: MessageType;
+    body?: string;
+    latitude?: number;
+    longitude?: number;
+    clientId?: string;
 };
 
 export type ClaimDetailsDto = {
@@ -668,32 +696,32 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<CityZoneDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
 export type PageableObject = {
-    offset?: number;
-    sort?: SortObject;
     paged?: boolean;
     pageNumber?: number;
     pageSize?: number;
     unpaged?: boolean;
+    offset?: number;
+    sort?: SortObject;
 };
 
 export type SortObject = {
-    empty?: boolean;
     sorted?: boolean;
     unsorted?: boolean;
+    empty?: boolean;
 };
 
 /**
@@ -706,16 +734,16 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<ReportListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -731,6 +759,10 @@ export type ReportListDto = {
     thumbnailUrl?: string;
     reported: boolean;
     matchCount?: number;
+    /**
+     * Reward in dinars the owner offers to the finder; only ever set on LOST reports.
+     */
+    rewardAmount?: number;
 };
 
 export type ReportChallengeDto = {
@@ -813,6 +845,30 @@ export type NearbyReportDto = {
     thumbnailUrl?: string;
     reported: boolean;
     distanceBand?: DistanceBand;
+    /**
+     * Reward in dinars the owner offers to the finder; only ever set on LOST reports.
+     */
+    rewardAmount?: number;
+};
+
+/**
+ * How many matching listings sit in one zone, placed at the zone's centroid. Never an exact location.
+ */
+export type ZoneReportCountDto = {
+    zoneId: number;
+    zoneName: string;
+    /**
+     * Municipality the zone sits in; null for a municipality itself.
+     */
+    parentId?: number;
+    /**
+     * Name of the parent municipality; null when it repeats the zone's own name.
+     */
+    parentName?: string;
+    latitude: number;
+    longitude: number;
+    lostCount: number;
+    foundCount: number;
 };
 
 export type ReportCategoryDto = {
@@ -840,6 +896,7 @@ export enum NotificationType {
     CLAIM_APPROVED = 'CLAIM_APPROVED',
     CLAIM_DECLINED = 'CLAIM_DECLINED',
     CHAT_MESSAGE = 'CHAT_MESSAGE',
+    THANKS_RECEIVED = 'THANKS_RECEIVED',
     ACCOUNT_BLOCKED = 'ACCOUNT_BLOCKED',
     ACCOUNT_PARTIALLY_BLOCKED = 'ACCOUNT_PARTIALLY_BLOCKED'
 }
@@ -855,16 +912,16 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -942,6 +999,10 @@ export type ConversationDetailsDto = {
      */
     otherReadAt?: string;
     createdAt: string;
+    /**
+     * True for the owner of the item while no thanks has been sent in this conversation, when POST /conversations/{id}/thanks is offered.
+     */
+    canThank: boolean;
 };
 
 export enum ConversationRole {
@@ -1054,6 +1115,7 @@ export type AdminReportDetailsDto = {
     contactEmail?: string;
     contactPhone?: string;
     images?: Array<ReportImageDto>;
+    rewardAmount?: number;
 };
 
 export type AdminMatchListDto = {
@@ -1080,16 +1142,16 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalPages?: number;
     totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
     size?: number;
     content?: Array<AdminMatchListDto>;
     number?: number;
     sort?: SortObject;
-    pageable?: PageableObject;
-    first?: boolean;
-    last?: boolean;
-    numberOfElements?: number;
     empty?: boolean;
 };
 
@@ -1907,6 +1969,45 @@ export type DismissMatchResponses = {
 
 export type DismissMatchResponse = DismissMatchResponses[keyof DismissMatchResponses];
 
+export type SendThanksData = {
+    body?: SendThanksRequestDto;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/conversations/{id}/thanks';
+};
+
+export type SendThanksErrors = {
+    /**
+     * The caller is the finder, not the owner of the item
+     */
+    400: MessageDto;
+    /**
+     * No such conversation of the caller
+     */
+    404: MessageDto;
+    /**
+     * Thanks already sent in this conversation
+     */
+    409: MessageDto;
+    /**
+     * Too many messages
+     */
+    429: MessageDto;
+};
+
+export type SendThanksError = SendThanksErrors[keyof SendThanksErrors];
+
+export type SendThanksResponses = {
+    /**
+     * Thanks sent
+     */
+    201: MessageDto;
+};
+
+export type SendThanksResponse = SendThanksResponses[keyof SendThanksResponses];
+
 export type MarkReadData = {
     body?: never;
     path: {
@@ -2698,6 +2799,27 @@ export type GetMyReportsResponses = {
 };
 
 export type GetMyReportsResponse = GetMyReportsResponses[keyof GetMyReportsResponses];
+
+export type GetReportMapData = {
+    body?: never;
+    path?: never;
+    query?: {
+        type?: ReportType;
+        categoryId?: number;
+        postedWithin?: TimeWindow;
+        search?: string;
+    };
+    url: '/reports/map';
+};
+
+export type GetReportMapResponses = {
+    /**
+     * One entry per zone with at least one listing
+     */
+    200: Array<ZoneReportCountDto>;
+};
+
+export type GetReportMapResponse = GetReportMapResponses[keyof GetReportMapResponses];
 
 export type GetAllCategoriesData = {
     body?: never;
