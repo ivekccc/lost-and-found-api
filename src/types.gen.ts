@@ -115,7 +115,6 @@ export type LocationRequest = {
  * Newly uploaded photos, shown after the kept ones
  */
 export type ReportImageRequestDto = {
-    imageUrl: string;
     publicId: string;
 };
 
@@ -279,7 +278,6 @@ export type UpdateMinQuestionsRequestDto = {
 };
 
 export type UpdateCategoryImageRequestDto = {
-    imageUrl: string;
     imagePublicId: string;
 };
 
@@ -537,7 +535,6 @@ export type ClaimAnswerRequestDto = {
 
 export type CreateClaimRequestDto = {
     message?: string;
-    photoUrl?: string;
     photoPublicId?: string;
     answers: Array<ClaimAnswerRequestDto>;
 };
@@ -568,6 +565,7 @@ export type ClaimDto = {
 export type VerifyRequestDto = {
     email: string;
     code: string;
+    password: string;
 };
 
 export type AuthResponseDto = {
@@ -1025,12 +1023,21 @@ export type ConversationUnreadCountDto = {
     count: number;
 };
 
+export type ErrorResponseDto = {
+    message: string;
+    status: number;
+    timestamp: string;
+};
+
 export type CloudinarySignatureDto = {
     signature: string;
     timestamp: number;
     cloudName: string;
     apiKey: string;
     publicId: string;
+    allowedFormats: string;
+    overwrite: boolean;
+    transformation: string;
 };
 
 export type ClaimantChallengeDto = {
@@ -1108,7 +1115,7 @@ export type UserDetailsDto = {
     activeSessions: number;
     googleLinked: boolean;
     language: AppLanguage;
-    activeCityName?: string;
+    activeCityName: string;
 };
 
 export type AdminReportListDto = {
@@ -2891,22 +2898,6 @@ export type GetMyClaimsResponses = {
 
 export type GetMyClaimsResponse = GetMyClaimsResponses[keyof GetMyClaimsResponses];
 
-export type SecretData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/secret';
-};
-
-export type SecretResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type SecretResponse = SecretResponses[keyof SecretResponses];
-
 export type GetReportMatchesData = {
     body?: never;
     path: {
@@ -3060,22 +3051,6 @@ export type GetQuestionTemplatesResponses = {
 };
 
 export type GetQuestionTemplatesResponse = GetQuestionTemplatesResponses[keyof GetQuestionTemplatesResponses];
-
-export type PingData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/ping';
-};
-
-export type PingResponses = {
-    /**
-     * OK
-     */
-    200: string;
-};
-
-export type PingResponse = PingResponses[keyof PingResponses];
 
 export type GetNotificationsData = {
     body?: never;
@@ -3250,6 +3225,15 @@ export type GetSignatureData = {
     query?: never;
     url: '/cloudinary/signature';
 };
+
+export type GetSignatureErrors = {
+    /**
+     * Too many signatures requested
+     */
+    429: ErrorResponseDto;
+};
+
+export type GetSignatureError = GetSignatureErrors[keyof GetSignatureErrors];
 
 export type GetSignatureResponses = {
     /**
