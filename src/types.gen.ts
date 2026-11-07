@@ -1059,6 +1059,27 @@ export type ClaimSummaryDto = {
     hasPhoto: boolean;
 };
 
+export enum UserStatus {
+    ACTIVE = 'ACTIVE',
+    BLOCKED = 'BLOCKED',
+    PARTIALLY_BLOCKED = 'PARTIALLY_BLOCKED',
+    DELETED = 'DELETED'
+}
+
+export type PageUserListDto = {
+    totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
+    size?: number;
+    content?: Array<UserListDto>;
+    number?: number;
+    sort?: SortObject;
+    empty?: boolean;
+};
+
 export type UserListDto = {
     id: number;
     email: string;
@@ -1066,7 +1087,7 @@ export type UserListDto = {
     firstName: string;
     lastName: string;
     phoneNumber?: string;
-    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED' | 'DELETED';
+    status: UserStatus;
     role: UserRole;
     createdAt: string;
 };
@@ -1078,9 +1099,16 @@ export type UserDetailsDto = {
     firstName: string;
     lastName: string;
     phoneNumber?: string;
-    status: 'ACTIVE' | 'BLOCKED' | 'PARTIALLY_BLOCKED' | 'DELETED';
+    status: UserStatus;
     role: UserRole;
     createdAt: string;
+    /**
+     * Signed-in devices whose refresh token has not expired.
+     */
+    activeSessions: number;
+    googleLinked: boolean;
+    language: AppLanguage;
+    activeCityName?: string;
 };
 
 export type AdminReportListDto = {
@@ -1097,6 +1125,20 @@ export type AdminReportListDto = {
      * City the report belongs to, derived from its location zone. Absent for reports created before location became mandatory — those are invisible in user-facing search, which is exactly what this column makes visible to a moderator.
      */
     cityName?: string;
+};
+
+export type PageAdminReportListDto = {
+    totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
+    size?: number;
+    content?: Array<AdminReportListDto>;
+    number?: number;
+    sort?: SortObject;
+    empty?: boolean;
 };
 
 export type AdminReportDetailsDto = {
@@ -1211,6 +1253,43 @@ export type AppliedMatchingConfigDto = {
 };
 
 /**
+ * Work waiting for a moderator right now.
+ */
+export type QueueCountsDto = {
+    pendingAbuseReports: number;
+    /**
+     * When the oldest pending abuse report was filed; null when the queue is empty.
+     */
+    oldestPendingAbuseReportAt?: string;
+    flaggedReports: number;
+    pendingClaims: number;
+    /**
+     * When the oldest pending ownership claim was submitted; null when there is none.
+     */
+    oldestPendingClaimAt?: string;
+};
+
+/**
+ * Listings per city: active now, and reunited within the requested period.
+ */
+export type CityOverviewDto = {
+    cityId: number;
+    cityName: string;
+    activeReports: number;
+    reunitedReports: number;
+};
+
+/**
+ * Platform activity on one calendar day.
+ */
+export type ActivityDayDto = {
+    day: string;
+    reportsPosted: number;
+    reportsReunited: number;
+    usersRegistered: number;
+};
+
+/**
  * Whole conversation for moderation, oldest message first.
  */
 export type AdminConversationDto = {
@@ -1237,6 +1316,85 @@ export type AdminClaimListDto = {
     decidedAt?: string;
 };
 
+export type PageAdminClaimListDto = {
+    totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
+    size?: number;
+    content?: Array<AdminClaimListDto>;
+    number?: number;
+    sort?: SortObject;
+    empty?: boolean;
+};
+
+export enum AuditAction {
+    REPORT_HIDDEN = 'REPORT_HIDDEN',
+    REPORT_RESTORED = 'REPORT_RESTORED',
+    USER_BLOCKED = 'USER_BLOCKED',
+    USER_RESTRICTED = 'USER_RESTRICTED',
+    USER_UNBLOCKED = 'USER_UNBLOCKED',
+    USER_DELETED = 'USER_DELETED',
+    USER_SESSIONS_REVOKED = 'USER_SESSIONS_REVOKED',
+    ABUSE_REPORT_DISMISSED = 'ABUSE_REPORT_DISMISSED',
+    CATEGORY_MIN_QUESTIONS_CHANGED = 'CATEGORY_MIN_QUESTIONS_CHANGED',
+    CATEGORY_IMAGE_CHANGED = 'CATEGORY_IMAGE_CHANGED',
+    QUESTION_TEMPLATE_CREATED = 'QUESTION_TEMPLATE_CREATED',
+    QUESTION_TEMPLATE_UPDATED = 'QUESTION_TEMPLATE_UPDATED',
+    QUESTION_TEMPLATE_DEACTIVATED = 'QUESTION_TEMPLATE_DEACTIVATED',
+    MATCHING_CONFIG_UPDATED = 'MATCHING_CONFIG_UPDATED'
+}
+
+export enum AuditTargetType {
+    REPORT = 'REPORT',
+    USER = 'USER',
+    ABUSE_REPORT = 'ABUSE_REPORT',
+    CATEGORY = 'CATEGORY',
+    QUESTION_TEMPLATE = 'QUESTION_TEMPLATE',
+    MATCHING_CONFIG = 'MATCHING_CONFIG'
+}
+
+/**
+ * One moderator action. Entries are never edited or deleted.
+ */
+export type AuditEntryDto = {
+    id: number;
+    /**
+     * Moderator who acted; null once that account is deleted, the name stays.
+     */
+    actorId?: number;
+    actorName: string;
+    action: AuditAction;
+    targetType: AuditTargetType;
+    targetId?: number;
+    summary: string;
+    /**
+     * Action-specific values, such as the previous and new matching weights.
+     */
+    details?: {
+        [key: string]: {
+            [key: string]: unknown;
+        };
+    };
+    createdAt: string;
+};
+
+export type PageAuditEntryDto = {
+    totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
+    size?: number;
+    content?: Array<AuditEntryDto>;
+    number?: number;
+    sort?: SortObject;
+    empty?: boolean;
+};
+
 export type AbuseReportDto = {
     id: number;
     reporterName: string;
@@ -1259,6 +1417,20 @@ export type AbuseReportDto = {
     reviewedByName?: string;
     reviewedAt?: string;
     resolutionNote?: string;
+};
+
+export type PageAbuseReportDto = {
+    totalElements?: number;
+    totalPages?: number;
+    numberOfElements?: number;
+    first?: boolean;
+    last?: boolean;
+    pageable?: PageableObject;
+    size?: number;
+    content?: Array<AbuseReportDto>;
+    number?: number;
+    sort?: SortObject;
+    empty?: boolean;
 };
 
 export type DeleteAccountRequestDto = {
@@ -2455,6 +2627,31 @@ export type UnblockUserResponses = {
     200: unknown;
 };
 
+export type RevokeSessionsData = {
+    body?: never;
+    path: {
+        id: number;
+    };
+    query?: never;
+    url: '/admin/users/{id}/sessions/revoke';
+};
+
+export type RevokeSessionsErrors = {
+    /**
+     * User not found
+     */
+    404: unknown;
+};
+
+export type RevokeSessionsResponses = {
+    /**
+     * Sessions revoked
+     */
+    204: void;
+};
+
+export type RevokeSessionsResponse = RevokeSessionsResponses[keyof RevokeSessionsResponses];
+
 export type PartialBlockUserData = {
     body?: never;
     path: {
@@ -3173,23 +3370,29 @@ export type GetChallengeResponses = {
 
 export type GetChallengeResponse = GetChallengeResponses[keyof GetChallengeResponses];
 
-export type GetAllUsersData = {
+export type GetUsersData = {
     body?: never;
     path?: never;
     query?: {
         role?: UserRole;
+        status?: UserStatus;
+        search?: string;
+        page?: number;
+        size?: number;
+        sort?: string;
+        direction?: string;
     };
     url: '/admin/users';
 };
 
-export type GetAllUsersResponses = {
+export type GetUsersResponses = {
     /**
-     * OK
+     * One page of users
      */
-    200: Array<UserListDto>;
+    200: PageUserListDto;
 };
 
-export type GetAllUsersResponse = GetAllUsersResponses[keyof GetAllUsersResponses];
+export type GetUsersResponse = GetUsersResponses[keyof GetUsersResponses];
 
 export type DeleteUserData = {
     body?: never;
@@ -3232,15 +3435,21 @@ export type GetReports1Data = {
         type?: ReportType;
         status?: ReportStatus;
         cityId?: number;
+        ownerId?: number;
+        search?: string;
+        page?: number;
+        size?: number;
+        sort?: string;
+        direction?: string;
     };
     url: '/admin/reports';
 };
 
 export type GetReports1Responses = {
     /**
-     * Reports returned
+     * One page of reports
      */
-    200: Array<AdminReportListDto>;
+    200: PageAdminReportListDto;
 };
 
 export type GetReports1Response = GetReports1Responses[keyof GetReports1Responses];
@@ -3311,6 +3520,58 @@ export type GetMatchResponses = {
 
 export type GetMatchResponse = GetMatchResponses[keyof GetMatchResponses];
 
+export type GetQueuesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/admin/dashboard/queues';
+};
+
+export type GetQueuesResponses = {
+    /**
+     * Queue counts
+     */
+    200: QueueCountsDto;
+};
+
+export type GetQueuesResponse = GetQueuesResponses[keyof GetQueuesResponses];
+
+export type GetCitiesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        days?: number;
+    };
+    url: '/admin/dashboard/cities';
+};
+
+export type GetCitiesResponses = {
+    /**
+     * One entry per city
+     */
+    200: Array<CityOverviewDto>;
+};
+
+export type GetCitiesResponse = GetCitiesResponses[keyof GetCitiesResponses];
+
+export type GetActivityData = {
+    body?: never;
+    path?: never;
+    query?: {
+        days?: number;
+    };
+    url: '/admin/dashboard/activity';
+};
+
+export type GetActivityResponses = {
+    /**
+     * One entry per day
+     */
+    200: Array<ActivityDayDto>;
+};
+
+export type GetActivityResponse = GetActivityResponses[keyof GetActivityResponses];
+
 export type GetConversation1Data = {
     body?: never;
     path: {
@@ -3343,33 +3604,72 @@ export type GetClaimsData = {
     path?: never;
     query?: {
         status?: ClaimStatus;
+        claimantId?: number;
+        reportId?: number;
+        page?: number;
+        size?: number;
+        sort?: string;
+        direction?: string;
     };
     url: '/admin/claims';
 };
 
 export type GetClaimsResponses = {
     /**
-     * OK
+     * One page of claims
      */
-    200: Array<AdminClaimListDto>;
+    200: PageAdminClaimListDto;
 };
 
 export type GetClaimsResponse = GetClaimsResponses[keyof GetClaimsResponses];
+
+export type GetEntriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        action?: AuditAction;
+        targetType?: AuditTargetType;
+        targetId?: number;
+        actorId?: number;
+        page?: number;
+        size?: number;
+        sort?: string;
+        direction?: string;
+    };
+    url: '/admin/audit-log';
+};
+
+export type GetEntriesResponses = {
+    /**
+     * One page of audit entries
+     */
+    200: PageAuditEntryDto;
+};
+
+export type GetEntriesResponse = GetEntriesResponses[keyof GetEntriesResponses];
 
 export type GetReports2Data = {
     body?: never;
     path?: never;
     query?: {
         status?: AbuseReportStatus;
+        targetType?: AbuseTargetType;
+        reason?: AbuseReason;
+        reportId?: number;
+        userId?: number;
+        page?: number;
+        size?: number;
+        sort?: string;
+        direction?: string;
     };
     url: '/admin/abuse-reports';
 };
 
 export type GetReports2Responses = {
     /**
-     * Successfully retrieved abuse reports
+     * One page of abuse reports
      */
-    200: Array<AbuseReportDto>;
+    200: PageAbuseReportDto;
 };
 
 export type GetReports2Response = GetReports2Responses[keyof GetReports2Responses];
