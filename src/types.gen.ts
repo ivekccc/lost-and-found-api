@@ -318,6 +318,8 @@ export type UpdateMatchingConfigRequest = {
     weightTime: number;
     timeDecayDays: number;
     scoreThreshold: number;
+    trigramShare: number;
+    semanticFloor: number;
 };
 
 /**
@@ -339,6 +341,18 @@ export type MatchingConfigDto = {
      * Minimum total score for a pair to be suggested
      */
     scoreThreshold: number;
+    /**
+     * Share of trigram similarity in the text signal, 0 to 1; the rest is semantic similarity
+     */
+    trigramShare: number;
+    /**
+     * Semantic similarity at or below this value counts as zero, 0 to 0.95
+     */
+    semanticFloor: number;
+    /**
+     * Name of the loaded text embedding model; absent when semantic comparison is off
+     */
+    semanticModel?: string;
     /**
      * When these values were last changed
      */
@@ -694,11 +708,11 @@ export type CityZoneDto = {
 };
 
 export type PageCityZoneDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<CityZoneDto>;
@@ -732,11 +746,11 @@ export enum TimeWindow {
 }
 
 export type PageReportListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<ReportListDto>;
@@ -910,11 +924,11 @@ export type NotificationDto = {
 };
 
 export type PageNotificationDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<NotificationDto>;
@@ -1074,11 +1088,11 @@ export enum UserStatus {
 }
 
 export type PageUserListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<UserListDto>;
@@ -1135,11 +1149,11 @@ export type AdminReportListDto = {
 };
 
 export type PageAdminReportListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<AdminReportListDto>;
@@ -1191,11 +1205,11 @@ export type AdminMatchListDto = {
 };
 
 export type PageAdminMatchListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<AdminMatchListDto>;
@@ -1215,10 +1229,18 @@ export type AdminMatchDetailsDto = {
     timeGapDays: number;
     timeScore: number;
     /**
-     * Trigram similarity of title and description, 0 to 1
+     * Combined text similarity, 0 to 1: trigram and semantic similarity blended by the applied share
      */
     textSimilarity: number;
     textScore: number;
+    /**
+     * Trigram similarity of title and description, 0 to 1; transliterated from Cyrillic for matches scored since November 2026
+     */
+    trigramSimilarity: number;
+    /**
+     * Cosine similarity of the two text embeddings, 0 to 1; absent when the model was not available
+     */
+    semanticSimilarity?: number;
     config: AppliedMatchingConfigDto;
     status: ReportMatchStatus;
     /**
@@ -1257,6 +1279,14 @@ export type AppliedMatchingConfigDto = {
      * Minimum total score for a pair to be suggested
      */
     scoreThreshold: number;
+    /**
+     * Share of trigram similarity in the text signal
+     */
+    trigramShare: number;
+    /**
+     * Semantic similarity at or below this value counted as zero
+     */
+    semanticFloor: number;
 };
 
 /**
@@ -1324,11 +1354,11 @@ export type AdminClaimListDto = {
 };
 
 export type PageAdminClaimListDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<AdminClaimListDto>;
@@ -1389,11 +1419,11 @@ export type AuditEntryDto = {
 };
 
 export type PageAuditEntryDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<AuditEntryDto>;
@@ -1427,11 +1457,11 @@ export type AbuseReportDto = {
 };
 
 export type PageAbuseReportDto = {
-    totalElements?: number;
     totalPages?: number;
-    numberOfElements?: number;
+    totalElements?: number;
     first?: boolean;
     last?: boolean;
+    numberOfElements?: number;
     pageable?: PageableObject;
     size?: number;
     content?: Array<AbuseReportDto>;
